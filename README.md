@@ -5,13 +5,14 @@ DSH 整合包平台 · **规范仓库**。
 像玩 Minecraft 整合包一样，**一键导出、分享、安装** DSH AI 智能体配置包。本仓库定义「整合包（modpack）」的全部格式标准：
 
 - `specs/manifest/` —— 包内 `manifest.json` 的契约（版本演进 v1 → v2 → v3）；
-- `specs/pack-structure/` —— `.tgz` 包的文件布局、扫描、安全过滤与打包/安装流程。
+- `specs/pack-structure/` —— `.tgz` 包的文件布局、扫描、安全过滤与打包/安装流程；
+- `specs/index/` —— `index.json` 索引契约（指针制 + 元数据平铺）。
 
 ## 生态
 
 | 仓库 | 职责 |
 |---|---|
-| **[DSH-PackForge](https://github.com/DSH-PackForge/DSH-PackForge)**（本仓库）| 格式规范：manifest 契约 + 包结构 |
+| **[DSH-PackForge](https://github.com/DSH-PackForge/DSH-PackForge)**（本仓库）| 格式规范：manifest / pack-structure / index |
 | **[ModPack-CLI](https://github.com/DSH-PackForge/ModPack-CLI)** | CLI：`modpack create / pack / publish / install / index` |
 | **[dsh-pack-market](https://github.com/DSH-PackForge/dsh-pack-market)** | 市场仓库：`index/index.json` 索引 + GitHub Pages 市场页（由 ModPack-Index + ModPack-Web 合并而来） |
 
@@ -26,9 +27,10 @@ DSH-PackForge/
 │   │   ├── v1.md                  # 已废弃（压平的 plugins[]）
 │   │   ├── v2.md                  # 历史（层栈契约；启动器仍兼容导入）
 │   │   └── v3.md                  # ★ 现行（可复现的层栈契约）
-│   └── pack-structure/            # .tgz 包结构
-│       ├── pack-structure.md      # ★ 现行（L1：单 .tgz 布局 / 扫描 / 安全过滤 / 打包 / 安装）
-│       └── v1.md                  # 预留占位
+│   ├── pack-structure/            # .tgz 包结构
+│   │   └── v1.md                  # ★ 现行（L1：单 .tgz 布局 / 扫描 / 安全过滤 / 打包 / 安装）
+│   └── index/
+│       └── index.md               # ★ 现行（index.json 索引契约，schemaVersion 1）
 ├── examples/                      # 示例包（预留）
 ├── LICENSE                        # MIT
 └── README.md
@@ -41,7 +43,8 @@ DSH-PackForge/
 | `specs/manifest/v3.md` | **现行** | 依赖「坐标 → 固定版本 / commit sha」、`dshVersion` 精确、displayName 多语言，可复现 |
 | `specs/manifest/v2.md` | 历史 | `bundles` / `dependencies` / `patch` 三分离层栈契约；启动器兼容导入 |
 | `specs/manifest/v1.md` | 已废弃 | 压平的 `plugins[]`，无法表达加载语义；安装时拒绝 |
-| `specs/pack-structure/pack-structure.md` | **现行** | L1 单 `.tgz`：扁平 Profile 快照 + 根 `manifest.json`，四类安全过滤 |
+| `specs/pack-structure/v1.md` | **现行** | L1 单 `.tgz`：扁平 Profile 快照 + 根 `manifest.json`，四类安全过滤 |
+| `specs/index/index.md` | **现行** | index.json 索引契约：指针制（`downloadUrl` + `sha256` + `size`）+ 元数据平铺 |
 
 ## 怎么选版本
 
