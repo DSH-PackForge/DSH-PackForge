@@ -88,11 +88,26 @@ Windows 按**扩展名**在注册表里查「shell 扩展」，找到对应 COM 
 [HKEY_LOCAL_MACHINE\Software\Classes\.dspack\shellex\{e357fccd-a995-4576-b01f-234630154e96}]
 @="{YOUR-CLSID}"
 
+; ★ 易漏：文件类型 ProgId（让 shell 识别 .dspack 为已注册类型）
+[HKEY_LOCAL_MACHINE\Software\Classes\.dspack]
+@="DspackPreview.PreviewHandler"
+
+; ★ 易漏：ProgId 下也挂 shellex（部分 shell 从 ProgId 而非扩展名查找）
+[HKEY_LOCAL_MACHINE\Software\Classes\DspackPreview.PreviewHandler\shellex\{8895b1c6-b41f-4c1c-a562-0d564250836f}]
+@="{YOUR-CLSID}"
+
 ; COM 类注册（原生 DLL，装到低权限进程可读的 Program Files）
 [HKEY_LOCAL_MACHINE\Software\Classes\CLSID\{YOUR-CLSID}\InprocServer32]
 @="C:\\Program Files\\DSH-PackForge\\dspack-preview\\DspackPreview.dll"
 "ThreadingModel"="Both"
+
+; ★ 易漏（关键）：登记到系统预览处理器清单。
+;   缺这一条，prevhost 会 LoadLibrary 该 DLL（DllMain 会跑）却不实例化（无 ctor），预览窗格空白。
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\PreviewHandlers]
+"{YOUR-CLSID}"="DSH-PackForge .dspack Preview Handler"
 ```
+
+> 三条「易漏」都用 `DllRegisterServer` 一并写入（`regsvr32` 一次搞定），不要手写 `.reg` 漏掉 `PreviewHandlers`。
 
 ---
 
