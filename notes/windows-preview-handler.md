@@ -100,11 +100,8 @@ Windows 按**扩展名**在注册表里查「shell 扩展」，找到对应 COM 
 
 在 `DoPreview` / `GetThumbnail` 里：
 
-1. 读流（`IInitializeWithStream`）或路径 → 读前 **8 字节**：
-   - 前 4 字节 ≠ `DSPK` → 判定**非 dspack**（改后缀/外来文件），显示「不是有效的 .dspack」并返回；
-   - 第 4–7 字节（uint32 LE）≠ 2 → 显示「不支持的 .dspack 版本」。
-2. **剥离这 8 字节**，剩余字节喂给 zip 库（不能直接喂，否则严格 zip 库会读成空/损坏，见先前实测）。
-3. 定位 `manifest.json`（v4），解析出卡片字段：
+1. 读流（`IInitializeWithStream`）或路径 → 直接按**标准 ZIP** 打开（`.dspack` 即纯 ZIP，文件头 `PK`，压缩软件可直开）。
+2. 读根 `manifest.json`（v4），解析出卡片字段：
 
 ```jsonc
 {
@@ -122,7 +119,9 @@ Windows 按**扩展名**在注册表里查「shell 扩展」，找到对应 COM 
 }
 ```
 
-4. 渲染：名称/版本/类型/描述/作者/运行版本/三层计数。
+3. 渲染：名称/版本/类型/描述/作者/运行版本/三层计数。
+
+> 容器识别由根 `dspack.json`（`format===dspack`、`version===2`）承载，见 `pack-structure/v2.md` §2.2；预览处理器只需 `manifest.json` 即可出卡。早期带 8 字节 `DSPK` 前导头的旧文件已废弃——处理器保留剥头向后兼容，但新文件一律为纯 ZIP。
 
 ---
 
@@ -154,12 +153,13 @@ Windows 按**扩展名**在注册表里查「shell 扩展」，找到对应 COM 
 
 ---
 
-## 10. 边界：与「头部 magic」的关系
+## 10. 边界：纯 ZIP 容器（已定案）
 
-本文读取流程**始终先剥 8 字节**，因此不依赖外部 zip 工具。但要留意两点交叉影响：
+`.dspack` **就是标准 ZIP + 根 `dspack.json` 标记**（无前导魔数字节），与 `pack-structure/v2.md` §2 一致：
 
-- **Explorer 的「压缩文件夹」浏览（zipfolder）**：若想双击 `.dspack` 直接像文件夹钻进去看，需要注册为压缩文件夹命名空间——但原生 zipfolder 无法解析我们的 8 字节前缀；要支持它，得回到「纯 zip + 内部标记」方案（见 `pack-structure/v2.md` §2 的 A/B/C 讨论）。当前选择 A（头 8 字节 magic），故**不做**原生钻取，预览/缩略图由本处理器自产。
-- 预览处理器自己剥字节，和严格 zip 库的兼容问题无关。
+- **压缩软件可直接打开**：文件头即 `PK`，WinRAR / 7-Zip / Explorer 自带 zipfolder 都能直接浏览；
+- **识别靠根标记文件** `dspack.json`（`format` / `version`），而非文件头字节；
+- 早期「前导 8 字节 magic」方案因「压缩软件打不开」已废弃；处理器保留剥头逻辑仅向后兼容旧文件，新文件一律纯 ZIP。
 
 ---
 
