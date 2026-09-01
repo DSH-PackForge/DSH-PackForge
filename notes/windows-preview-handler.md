@@ -97,17 +97,24 @@ Windows 按**扩展名**在注册表里查「shell 扩展」，找到对应 COM 
 @="{YOUR-CLSID}"
 
 ; COM 类注册（原生 DLL，装到低权限进程可读的 Program Files）
+[HKEY_LOCAL_MACHINE\Software\Classes\CLSID\{YOUR-CLSID}]
+@="DspackPreview.PreviewHandler"
+; ★★★ 最关键：AppID 决定处理器被托管进 prevhost.exe 代理进程。
+;   这是系统共享的 "Preview Handler Surrogate Host" AppID，其 DllSurrogate=%SystemRoot%\system32\prevhost.exe。
+;   缺了它，AssocQueryString 能解析到 CLSID，但 COM 不把它注入 prevhost → 预览报「无法预览此文件」且 prevhost 里没有 DLL 装载记录。
+"AppID"="{6d2b5079-2f0b-48dd-ab7f-97cec514d30b}"
+"AutomaticallyPreviewUntrustedFiles"=dword:00000001
+
 [HKEY_LOCAL_MACHINE\Software\Classes\CLSID\{YOUR-CLSID}\InprocServer32]
 @="C:\\Program Files\\DSH-PackForge\\dspack-preview\\DspackPreview.dll"
-"ThreadingModel"="Both"
+"ThreadingModel"="Apartment"
 
-; ★ 易漏（关键）：登记到系统预览处理器清单。
-;   缺这一条，prevhost 会 LoadLibrary 该 DLL（DllMain 会跑）却不实例化（无 ctor），预览窗格空白。
+; ★ 易漏：登记到系统预览处理器清单(缺它 prevhost 会 LoadLibrary 该 DLL 却不实例化、无 ctor)。
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\PreviewHandlers]
 "{YOUR-CLSID}"="DSH-PackForge .dspack Preview Handler"
 ```
 
-> 三条「易漏」都用 `DllRegisterServer` 一并写入（`regsvr32` 一次搞定），不要手写 `.reg` 漏掉 `PreviewHandlers`。
+> 全部键都由 `DllRegisterServer` 一次性写入（`regsvr32` 即生效）。实测「三层」缺一不可，按调用链理解：**`AppID`（进 prevhost 代理）→ `PreviewHandlers`（被实例化）→ `ProgId`/`.dspack\shellex`（被找到）**，缺任何一层都是「无法预览此文件」。
 
 ---
 
