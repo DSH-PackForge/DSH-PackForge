@@ -6,7 +6,8 @@ DSH 整合包平台 · **规范仓库**。
 
 - `specs/manifest/` —— 包内 `manifest.json` 的契约（版本演进 v1 → v2 → v3 → v4）；
 - `specs/pack-structure/` —— 包结构：`.tgz`（v1，现行）→ `.dspack`（v2，未来）；
-- `specs/index/` —— `index.json` 索引契约（指针制 + 元数据平铺）。
+- `specs/index/` —— `index.json` 索引契约（指针制 + 元数据平铺）；
+- `specs/publishing/` —— 发布契约：仓库创建 + Release 发布 + `dsh-pack` 收录。
 
 ## 生态
 
@@ -33,6 +34,8 @@ DSH-PackForge/
 │   │   └── v2.md                  # 未来（.dspack：DSPK 头 + ZIP + overrides）
 │   └── index/
 │       └── index.md               # ★ 现行（index.json 索引契约，schemaVersion 1）
+│   └── publishing/
+│       └── v1.md                  # ★ 现行（仓库创建 + Release 发布 + 收录契约）
 ├── notes/                         # 实现备忘（非 spec）
 │   └── windows-preview-handler.md # .dspack 预览/缩略图处理器开发备忘
 ├── examples/                      # 示例包（预留）
@@ -51,6 +54,7 @@ DSH-PackForge/
 | `specs/pack-structure/v1.md` | **现行** | L1 单 `.tgz`：扁平 Profile 快照 + 根 `manifest.json`，四类安全过滤 |
 | `specs/pack-structure/v2.md` | **未来** | `.dspack`：ZIP 内核 + `DSPK` 头 + `overrides/` + 可选 `files[]` 按需拉取 |
 | `specs/index/index.md` | **现行** | index.json 索引契约：指针制（`downloadUrl` + `sha256` + `size`）+ 元数据平铺 |
+| `specs/publishing/v1.md` | **现行** | 仓库创建 + Release 发布 + sha256 侧车 + `dsh-pack` 话题收录 |
 
 ## 怎么选版本
 
