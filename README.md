@@ -31,7 +31,7 @@ DSH-PackForge/
 │   │   └── v4.md                  # 未来（v3 + type + files[]）
 │   ├── pack-structure/            # 包结构
 │   │   ├── v1.md                  # ★ 现行（L1：单 .tgz 布局 / 扫描 / 安全过滤 / 打包 / 安装）
-│   │   └── v2.md                  # 未来（.dspack：DSPK 头 + ZIP + overrides）
+│   │   └── v2.md                  # 未来（.dspack：纯 ZIP + dspack.json + overrides）
 │   └── index/
 │       └── index.md               # ★ 现行（index.json 索引契约，schemaVersion 1）
 │   └── publishing/
@@ -52,7 +52,7 @@ DSH-PackForge/
 | `specs/manifest/v2.md` | 历史 | `bundles` / `dependencies` / `patch` 三分离层栈契约；启动器兼容导入 |
 | `specs/manifest/v1.md` | 已废弃 | 压平的 `plugins[]`，无法表达加载语义；安装时拒绝 |
 | `specs/pack-structure/v1.md` | **现行** | L1 单 `.tgz`：扁平 Profile 快照 + 根 `manifest.json`，四类安全过滤 |
-| `specs/pack-structure/v2.md` | **未来** | `.dspack`：ZIP 内核 + `DSPK` 头 + `overrides/` + 可选 `files[]` 按需拉取 |
+| `specs/pack-structure/v2.md` | **未来** | `.dspack`：纯 ZIP + 根 `dspack.json` 标记 + `overrides/` + 可选 `files[]` 按需拉取 |
 | `specs/index/index.md` | **现行** | index.json 索引契约：指针制（`downloadUrl` + `sha256` + `size`）+ 元数据平铺 |
 | `specs/publishing/v1.md` | **现行** | 仓库创建 + Release 发布 + sha256 侧车 + `dsh-pack` 话题收录 |
 
