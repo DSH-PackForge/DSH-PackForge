@@ -28,10 +28,12 @@ DSH-PackForge/
 │   │   ├── v1.md                  # 已废弃（压平的 plugins[]）
 │   │   ├── v2.md                  # 历史（层栈契约；启动器仍兼容导入）
 │   │   ├── v3.md                  # ★ 现行（可复现的层栈契约）
-│   │   └── v4.md                  # 未来（v3 + type + files[]）
+│   │   ├── v4.md                  # 未来（v3 + type + files[]）
+│   │   └── v5.md                  # 未来（统一：type profile / dshhome）
 │   ├── pack-structure/            # 包结构
 │   │   ├── v1.md                  # ★ 现行（L1：单 .tgz 布局 / 扫描 / 安全过滤 / 打包 / 安装）
-│   │   └── v2.md                  # 未来（.dspack：纯 ZIP + dspack.json + overrides）
+│   │   ├── v2.md                  # 未来（.dspack：纯 ZIP + dspack.json + overrides）
+│   │   └── v3.md                  # 未来（统一：profile + home/ 与 dshhome 两形态）
 │   └── index/
 │       └── index.md               # ★ 现行（index.json 索引契约，schemaVersion 1）
 │   └── publishing/
@@ -47,12 +49,14 @@ DSH-PackForge/
 
 | 规范 | 状态 | 一句话 |
 |---|---|---|
+| `specs/manifest/v5.md` | **未来** | 统一版本：`type:"profile"`（单 profile）或 `type:"dshhome"`（多 profile + preset / skill / 指令） |
 | `specs/manifest/v4.md` | **未来** | v3 + `type`（profile/collection 预留）+ 可选 `files[]` 下载清单 |
 | `specs/manifest/v3.md` | **现行** | 依赖「坐标 → 固定版本 / commit sha」、`dshVersion` 精确、displayName 多语言，可复现 |
 | `specs/manifest/v2.md` | 历史 | `bundles` / `dependencies` / `patch` 三分离层栈契约；启动器兼容导入 |
 | `specs/manifest/v1.md` | 已废弃 | 压平的 `plugins[]`，无法表达加载语义；安装时拒绝 |
 | `specs/pack-structure/v1.md` | **现行** | L1 单 `.tgz`：扁平 Profile 快照 + 根 `manifest.json`，四类安全过滤 |
 | `specs/pack-structure/v2.md` | **未来** | `.dspack`：纯 ZIP + 根 `dspack.json` 标记 + `overrides/` + 可选 `files[]` 按需拉取 |
+| `specs/pack-structure/v3.md` | **未来** | `.dspack` v3：统一 profile（`overrides/` + 可选 `home/`）与 dshhome（`overrides/` 按 `$DSH_HOME` 平铺）两形态 |
 | `specs/index/index.md` | **现行** | index.json 索引契约：指针制（`downloadUrl` + `sha256` + `size`）+ 元数据平铺 |
 | `specs/publishing/v1.md` | **现行** | 仓库创建 + Release 发布 + sha256 侧车 + `dsh-pack` 话题收录 |
 
