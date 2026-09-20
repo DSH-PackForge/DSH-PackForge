@@ -35,7 +35,7 @@
 
 | 字段 | 类型 | 必需 | 说明 |
 | --- | --- | --- | --- |
-| `manifestVersion` | number | 否 | 声明本条所遵循的 manifest 契约版本（3/4/5），采集器缺省按 4 |
+| `manifestVersion` | number | 否 | 声明本条所遵循的 manifest 契约版本（3/4/5），采集器缺省按 5 |
 | `type` | string | 否 | `"profile"` \| `"dshhome"`；缺省按 `"profile"`（v5 dshhome 显式声明） |
 | `name` | string | ✅ | slug（`^[a-z0-9-]+$`）；与 `version` 组成唯一键 |
 | `version` | string | ✅ | semver |
@@ -60,7 +60,7 @@
 
 ---
 
-## 4. 完整示例（manifest v4 profile 条目）
+## 4. 完整示例（manifest v5 profile 条目）
 
 ```json
 {
@@ -68,7 +68,7 @@
   "generatedAt": "2026-09-02T15:44:00.000Z",
   "modpacks": [
     {
-      "manifestVersion": 4,
+      "manifestVersion": 5,
       "type": "profile",
       "name": "all-about-whales",
       "version": "1.0.0",
