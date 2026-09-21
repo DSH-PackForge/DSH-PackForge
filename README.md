@@ -41,6 +41,8 @@ DSH-PackForge/
 │       └── v1.md                  # ★ 现行（仓库创建 + Release 发布 + 收录契约）
 ├── notes/                         # 实现备忘（非 spec）
 │   └── windows-preview-handler.md # .dspack 预览/缩略图处理器开发备忘
+├── docs/                          # 实现指南（非 spec）
+│   └── launcher-integration.md    # 启动器集成指南（导出 pack / 市场 market / 导入 install 三职责）
 ├── examples/                      # 示例包（预留）
 ├── LICENSE                        # MIT
 └── README.md
@@ -60,6 +62,8 @@ DSH-PackForge/
 | `specs/pack-structure/v3.md` | **现行** | `.dspack` v3：统一 profile（`overrides/` + 可选 `home/`）与 dshhome（`overrides/` 按 `$DSH_HOME` 平铺）两形态 |
 | `specs/index/index.md` | **现行** | index.json 索引契约（schemaVersion 2）：精简指针制 + `packs/<owner>.<repo>/` 懒加载完整 manifest/README |
 | `specs/publishing/v1.md` | **现行** | 仓库创建 + Release 发布 + sha256 侧车 + `dsh-pack` 话题收录 |
+
+> 给启动器作者：见 [`docs/launcher-integration.md`](docs/launcher-integration.md) —— 导出（pack）、市场（market）、导入（install）三段式实现指南（现行 v5 / `.dspack` v3 为主线，历史版本向后兼容）。
 
 ## 怎么选版本
 
