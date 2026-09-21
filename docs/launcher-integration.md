@@ -55,7 +55,8 @@
 ## 1.4 导出自检清单
 
 - [ ] **字段完整**：`manifest.json` 必需字段齐全；`displayName` / `description`（多语言）、`author`、`icon`、`dshVersion`（精确版本）、`patch` 尽量填，缺失会让市场页展示空、`dshVersion` 回退本机最新（可复现性打折）。
-- [ ] **工作区配置 + 机器文件**：`pnpm-workspace.yaml`（pnpm 工作区配置，承载 hoist / allowBuilds 等 profile 的 pnpm 设置）、`pnpm-lock.yaml`（锁文件，让导入侧 `--frozen-lockfile` 复现传递依赖）、`package.json`（profile 清单快照）一并进包。
+- [ ] **机器文件**：`package.json`（profile 清单快照）、`pnpm-workspace.yaml`（pnpm 工作区配置：hoist / allowBuilds 等）、`pnpm-lock.yaml`（锁文件，让导入侧 `--frozen-lockfile` 复现传递依赖）一并进包。
+- [ ] **工作区快照排除**：`.dshpkcfg`（导出工作区快照，见 `../specs/workspace-config/v1.md`）**不打包**——命中安全过滤精确名排除，与凭据/运行时状态一同过滤。
 - [ ] **机器/用户文件分离**：`package.json` 只是快照，其 `dependencies` / `dsh.profile.bundles` 由 manifest 权威重建，**不依赖快照内容**；用户文件只进 `overrides/`（+ `home/`）。
 - [ ] 四类安全过滤 + v3 扩展已生效，重内容走 `files[]` 不进包体。
 
@@ -122,11 +123,12 @@ v5 用 `type` 统一两种形态：
 
 ### 3.2.2 profile 形态
 
-1. `overrides/` 覆盖到 profile 根（`cordis.patch.yml` 等用户文件落地）；
-2. 依赖重建（§3.3，`pnpm install`）→ 对账（§3.4，`reconcileProfile`）；
-3. `home/`（可选）覆盖到 `$DSH_HOME` 根（全局 skill / `.agent-presets` / `AGENTS.md`）；
-4. `files[]` 重内容下载 + 校验（§3.5），失败回滚；
-5. profile 名默认 `profileName`（缺省 `pack`），设为默认 profile。
+1. 依赖重建（§3.3，`pnpm install`）；
+2. `overrides/` 覆盖到 profile 根（`cordis.patch.yml` 等用户文件**最后落盘，压过依赖默认项**）；
+3. 对账（§3.4，`reconcileProfile`）；
+4. `home/`（可选）覆盖到 `$DSH_HOME` 根（全局 skill / `.agent-presets` / `AGENTS.md`）；
+5. `files[]` 重内容下载 + 校验（§3.5），失败回滚；
+6. 新建 profile：名称取 manifest 的 `profileName`（缺省 `pack`），设为该实例默认 profile。
 
 ### 3.2.3 dshhome 形态
 

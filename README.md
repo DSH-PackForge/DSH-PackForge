@@ -8,6 +8,7 @@ DSH 整合包平台 · **规范仓库**。
 - `specs/pack-structure/` —— 包结构：`.tgz`（v1，历史）→ `.dspack`（v2，历史）→ `.dspack` v3（现行）；
 - `specs/index/` —— `index.json` 索引契约（schemaVersion 2：精简指针制 + packs/ 懒加载）；
 - `specs/publishing/` —— 发布契约：仓库创建 + Release 发布 + `dsh-pack` 收录。
+- `specs/workspace-config/` —— `.dshpkcfg` 导出工作区快照（导出参数持久化，不打包）。
 
 ## 生态
 
@@ -37,8 +38,10 @@ DSH-PackForge/
 │   │   └── v3.md                  # ★ 现行（统一：profile + home/ 与 dshhome 两形态）
 │   ├── index/
 │   │   └── index.md               # ★ 现行（index.json 索引契约，schemaVersion 2）
-│   └── publishing/
-│       └── v1.md                  # ★ 现行（仓库创建 + Release 发布 + 收录契约）
+│   ├── publishing/
+│   │   └── v1.md                  # ★ 现行（仓库创建 + Release 发布 + 收录契约）
+│   └── workspace-config/
+│       └── v1.md                  # ★ 现行（.dshpkcfg 导出工作区快照）
 ├── notes/                         # 实现备忘（非 spec）
 │   └── windows-preview-handler.md # .dspack 预览/缩略图处理器开发备忘
 ├── docs/                          # 实现指南（非 spec）
@@ -62,6 +65,7 @@ DSH-PackForge/
 | `specs/pack-structure/v3.md` | **现行** | `.dspack` v3：统一 profile（`overrides/` + 可选 `home/`）与 dshhome（`overrides/` 按 `$DSH_HOME` 平铺）两形态 |
 | `specs/index/index.md` | **现行** | index.json 索引契约（schemaVersion 2）：精简指针制 + `packs/<owner>.<repo>/` 懒加载完整 manifest/README |
 | `specs/publishing/v1.md` | **现行** | 仓库创建 + Release 发布 + sha256 侧车 + `dsh-pack` 话题收录 |
+| `specs/workspace-config/v1.md` | **现行** | `.dshpkcfg` 导出工作区快照（导出参数持久化，不打包） |
 
 > 给启动器作者：见 [`docs/launcher-integration.md`](docs/launcher-integration.md) —— 导出（pack）、市场（market）、导入（install）三段式实现指南（现行 v5 / `.dspack` v3 为主线，历史版本向后兼容）。
 
