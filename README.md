@@ -76,6 +76,37 @@ DSH-PackForge/
 - **v5 `dshhome` 形态（多 profile + preset / skill / 指令）现由 `.dspack` v3 统一承载**。
 - **改打包/安装结构 → `pack-structure`**，与 `dsh-packforge-app` 的格式演进对齐（L1 `.tgz` → L2 `.dspack` → L3 重内容 `files[]` 按需拉取）。
 
+## 启动器徽章
+
+启动器可在 README 挂徽章，声明对 DSH-PackForge 整合包的支持。徽章由 `dsh-pack-market` 生成并部署在 GitHub Pages（把 `zh` 换成 `en` 即英文版）。
+
+**支持徽章**（声明「这是一个支持 DSH-PackForge 整合包的启动器」）：
+
+```markdown
+[![支持 DSH-PackForge 整合包](https://dsh-packforge.github.io/dsh-pack-market/badges/launchers/dsh-packforge-support-zh.svg)](https://dsh-packforge.github.io/dsh-pack-market/)
+```
+
+**版本徽章**（声明支持的具体规范版本，文件名统一为）：
+
+```
+https://dsh-packforge.github.io/dsh-pack-market/badges/versions/manifest-v{1..5}-{zh,en}.svg   # 清单（manifest）
+https://dsh-packforge.github.io/dsh-pack-market/badges/versions/pack-v{1..3}-{zh,en}.svg       # 结构（pack-structure）
+```
+
+| 版本 | 状态 |
+|---|---|
+| `manifest v5` / `pack v3` | **现行** |
+| `manifest v4 / v3 / v2`、`pack v2 / v1` | 历史（仍兼容导入） |
+| `manifest v1` | 已废弃（安装时拒绝，一般不挂） |
+
+示例（支持最新规范的启动器 README 顶部）：
+
+```markdown
+[![支持 DSH-PackForge 整合包](https://dsh-packforge.github.io/dsh-pack-market/badges/launchers/dsh-packforge-support-zh.svg)](https://dsh-packforge.github.io/dsh-pack-market/)
+![清单 v5](https://dsh-packforge.github.io/dsh-pack-market/badges/versions/manifest-v5-zh.svg)
+![结构 v3](https://dsh-packforge.github.io/dsh-pack-market/badges/versions/pack-v3-zh.svg)
+```
+
 ## 参与修订
 
 1. 在 `specs/` 下新增或修改对应版本文档；
