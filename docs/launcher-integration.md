@@ -10,7 +10,7 @@
 
 | 职责 | CLI 命令 | 输入 → 输出 | 对应 spec |
 | --- | --- | --- | --- |
-| **导出** | `dspack pack` | profile / `$DSH_HOME` → `.dspack` v3 + `sha256` 侧车 | manifest v5（buildManifest）、pack-structure v3（扫描/过滤/打包）、publishing（发布） |
+| **导出** | `dspack pack` / `pack-home` / `pack --repo` | profile / `$DSH_HOME` → `.dspack` v3（`.sha256` 侧车仅 `--repo` 形态写） | manifest v5（buildManifest）、pack-structure v3（扫描/过滤/打包）、publishing（发布） |
 | **市场** | `dspack list / view / market` | 中心索引 → 列表 / 详情 / 下载好的包 | index（索引契约）、publishing（收录流程） |
 | **导入** | `dspack install` | 包文件 → 可运行 profile / `$DSH_HOME` | manifest / pack-structure 的「导入行为」章节 |
 
@@ -21,44 +21,138 @@
 # 第一部分 · 导出（Pack）
 
 > 目标：把本机一个 profile（或整个 `$DSH_HOME`）打成可分发、可复现的 `.dspack` v3。
+>
+> 实现入口（`dsh-packforge-app/packages/core/src/`）：`pack.js`（`packProfile` / `packHome`）、`manifest.js`（`buildManifest` / `buildHomeManifest` / 坐标钉定）、`scan.js` + `security.js`（扫描 + 过滤）、`workspace.js`（`.dshpkcfg` 参数）、`repo.js`（`exportRepo` 源仓库形态）。权威契约仍是 `../specs/manifest/v5.md`、`../specs/pack-structure/v3.md`，本文只做实现串联，冲突以 spec 为准。
 
-## 1.1 产物
+## 1.1 三条导出路径（先分清）
 
-```
-<manifest.name>-<manifest.version>.dspack      # 包本体（纯 ZIP）
-<manifest.name>-<manifest.version>.dspack.sha256   # sha256 侧车（发布/收录用）
-```
+导出不是「一条流程」，而是**三个入口、三种产物**：
 
-打包流程还产出两个供索引校验的字段：整包 `sha256` 与 `size`。
+| 入口 | CLI | 输入 | 产物 | 写 `.sha256` 侧车？ |
+| --- | --- | --- | --- | --- |
+| `packProfile` | `dspack pack <profile\|dir>` | 单个 profile 目录 | `.dspack` v3（**内存**拼 ZIP，返回 `sha256` / `size`） | 否 |
+| `packHome` | `dspack pack-home <home>` | 整个 `$DSH_HOME` | `.dspack` v3（dshhome 形态） | 否 |
+| `exportRepo` | `dspack pack --repo` | 单个 profile 目录 | **源仓库**（`release/` 内 `.dspack` + `.sha256`） | 是（见 §1.6） |
 
-## 1.2 流程
+- 纯 `pack` / `pack-home` **只返回** `sha256` 与 `size`（供索引/收录校验），**不落 `.sha256` 侧车**；侧车由 `exportRepo` 写，或发布时按 `../specs/publishing/v1.md` §4 手写。
+- 三个入口都走「扫描 → manifest → 组装 → 写盘」的主干，区别在形态与产物（§1.4 ~ §1.6）。
 
-1. **扫描源**：profile 形态扫单个 profile 目录；dshhome 形态扫整个 `$DSH_HOME`（`~/.dsh`，**明确排除** `~/.agents` 与项目级 `.dsh/`、`.agents/`、`AGENTS.md` / `CLAUDE.md`）。
-2. **安全过滤**：四类规则（精确名 / 扩展名 / 文件名正则 / 路径正则，见 `../specs/pack-structure/v1.md` §5）+ v3 新增 home 级排除（`.credentials.yaml` / `.anonymous-user-id` / `attachments/` / `settings.yaml` / `skills/.system/` / `profiles/web` / `profiles/headless`，见 `../specs/pack-structure/v3.md` §8）。
-3. **buildManifest**：生成 v5 `manifest.json`（`type: "profile"` 或 `"dshhome"`，字段见 `../specs/manifest/v5.md` §2）。**字段必须完整**：必需字段（`manifestVersion`=5 / `type` / `name` / `version`；profile 形态的 `bundles` `dependencies`；dshhome 形态的 `defaultProfile` `profiles`）一个不能少；`displayName` / `description`（多语言 map）、`author`、`icon`、`dshVersion`（精确版本）、`patch` 等可选字段也应尽量填——它们决定市场页展示与可复现性。
-4. **布局组装**（`../specs/pack-structure/v3.md` §3）：
-   - 根：`dspack.json`（`{ "format": "dspack", "version": 3 }`）+ `manifest.json` + 机器文件 `package.json`（profile 清单快照）/ `pnpm-workspace.yaml`（pnpm 工作区配置）/ `pnpm-lock.yaml`（锁文件）（务必一并进包，见 §1.4）；
-   - profile 形态：用户文件进 `overrides/`（→ profile 根）+ 可选 `home/`（→ `$DSH_HOME` 根）；
-   - dshhome 形态：用户文件按 `$DSH_HOME` 相对路径平铺进 `overrides/`。
-5. **打 ZIP**：纯 ZIP（`PK` 头），根必含 `dspack.json` 与 `manifest.json`。
-6. **产出三指针**：整包 `sha256` + `size`，写 `.sha256` 侧车（64 位小写 hex）。
-7. **发布**（把包送上市场，见第三部分前的衔接）：按 `../specs/publishing/v1.md` 建仓 / 打 tag / 发 Release，或写 `downloadUrl` 直链。
+## 1.2 参数来源：`.dshpkcfg` 打底 + 显式覆盖
 
-## 1.3 打包实现约定（继承 v1 §6，通用）
+导出参数不是每次手填，而是**工作区快照 `.dshpkcfg` 打底、显式参数覆盖**（`workspace.js` 的 `exportFromWorkspace` / `exportHomeFromWorkspace`）：
 
-- **暂存区隔离**：在系统临时目录组装，**绝不改动源 profile / `$DSH_HOME`**，结束清理；
-- **`/` 分隔符**：归档内 `rel` 一律 `/`，与 Windows 反斜杠无关；
-- **符号链接跳过**：不做解引用，防逃出源目录与死循环；
-- **机器文件 utf8NoBOM**：Windows 下误写 UTF-8 BOM 会导致安装端 `JSON.parse` 崩；
-- **重内容不进包体**：模型 / 数据 / 非 npm/git 二进制写进 manifest 的 `files[]`（dshhome 形态另可 `skills[]`），只记指针。
+- `config`（`.dshpkcfg`，契约 `../specs/workspace-config/v1.md`）打底，CLI flag / GUI 表单 / AI 工具参数 `overrides` 覆盖，`undefined` / `null` 视为「未设置、不覆盖」。
+- **dshVersion 注入优先级**（`cli.js`）：`--dsh-version` > `.dshpkcfg.dshVersion` > 本机最新已装版本（`listInstalledDshVersions()[0]`）> 空串（导入端兜底）。`buildManifest` 本身只 `opts.dshVersion || ''`，**注入在 CLI 层**，不在扫描器。
+- **dshhome 的 `exportContent` 开关**（`{skill,preset,instruction,data}` 布尔）→ `exclude` 前缀映射：`skill:false` → 排除 `skills/`，`preset:false` → 排除 `.agent-presets/`，`instruction:false` → 排除 `AGENTS.md`，`data:false` → 排除 `data/`。
+- `.dshpkcfg` 自身**永不进包**（命中 `security.js` 的 `DENY_EXACT` 精确名 `.dshpkcfg`，与凭据 / 运行时状态一同过滤）。
 
-## 1.4 导出自检清单
+## 1.3 扫描与安全过滤（两形态共用第一步）
 
-- [ ] **字段完整**：`manifest.json` 必需字段齐全；`displayName` / `description`（多语言）、`author`、`icon`、`dshVersion`（精确版本）、`patch` 尽量填，缺失会让市场页展示空、`dshVersion` 回退本机最新（可复现性打折）。
-- [ ] **机器文件**：`package.json`（profile 清单快照）、`pnpm-workspace.yaml`（pnpm 工作区配置：hoist / allowBuilds 等）、`pnpm-lock.yaml`（锁文件，让导入侧 `--frozen-lockfile` 复现传递依赖）一并进包。
-- [ ] **工作区快照排除**：`.dshpkcfg`（导出工作区快照，见 `../specs/workspace-config/v1.md`）**不打包**——命中安全过滤精确名排除，与凭据/运行时状态一同过滤。
-- [ ] **机器/用户文件分离**：`package.json` 只是快照，其 `dependencies` / `dsh.profile.bundles` 由 manifest 权威重建，**不依赖快照内容**；用户文件只进 `overrides/`（+ `home/`）。
-- [ ] 四类安全过滤 + v3 扩展已生效，重内容走 `files[]` 不进包体。
+`scanProfile(host, dir)` 递归扫描源目录（`scan.js`）：
+
+- 返回 `{ files: [{rel, abs, size}], excluded: [{rel, abs, reason}] }`，`rel` **一律 `/` 分隔**（与 Windows 反斜杠无关），按 `rel` 排序。
+- **符号链接整体跳过**（`reason: 'symlink'`），不做解引用——防逃出源目录与死循环。
+- 读不到的目录（无权限等）静默跳过，读不到大小的文件记为 0。
+
+安全过滤 `isExcluded(rel)`（`security.js`）共**五类**，命中即排除：
+
+| 类别 | 命中方式 | 内容（摘） |
+| --- | --- | --- |
+| 精确名 | 任意路径段 | `node_modules` `dist` `build` `coverage` `.cache` `cordis.yml` `manifest.json` `package-lock.json` `yarn.lock` `.env` `.npmrc` … 及 home 级 `.credentials.yaml` `.anonymous-user-id` `settings.yaml` `.dshpkcfg` |
+| 扩展名 | 文件后缀 | `.key` `.pem` `.p12` `.pfx` `.crt` `.der` `.asc` |
+| 文件名正则 | basename | `.env*`、`credentials*.ya?ml`、`*.credentials`、SSH 私钥 `id_rsa*` 等、`secrets*.json/yml`、`*token*` / `*api_key*` |
+| 相对路径正则 | 整条 rel | `*.tgz` `*.tar.gz` `*.zip` `*.dspack`（**禁止嵌套打包任何压缩包**） |
+| 路径前缀 | rel 前缀 | `attachments/` `profiles/web/` `profiles/headless/` `skills/.system/`（home 级运行时 / 基线目录） |
+
+> 注意：`.credentials.yaml` / `settings.yaml` 等是**精确名（任意段命中）**，不是独立的「v3 home 级」类别；`attachments/`、`profiles/web/` 等才是第 5 类**路径前缀**。完整清单以 `security.js` 为准，spec 侧对应 `../specs/pack-structure/v1.md` §5 与 `v3.md` §8。
+
+## 1.4 生成 manifest v5
+
+### 1.4.1 profile 形态（`buildManifest`）
+
+字段来源（`manifest.js`）：
+
+| 字段 | 来源 |
+| --- | --- |
+| `manifestVersion` / `type` | 固定 `5` / `"profile"` |
+| `name` | `sanitizeSlug(opts.name \|\| profile.name)`（小写、非 `[a-z0-9-]` 转 `-`） |
+| `version` | `opts.version \|\| package.json.version \|\| '1.0.0'` |
+| `displayName` | `opts.displayName \|\| niceName(package.json.name) \|\| name`（去 `dsh-profile-` / `dsh-` 前缀） |
+| `description` / `author` | `opts` 优先，回退 `package.json` 同名字段 |
+| `icon` | `opts.icon \|\| findIcon(scan.files)`（`icons?/<…>.<png\|jpg\|webp\|ico\|svg>` 或根 `logo.*`） |
+| `dshVersion` | `opts.dshVersion`（CLI 注入，见 §1.2） |
+| `profileName` | `opts.profileName \|\| profile.name` |
+| `bundles` | `extractBundles(pkg)`：`package.json` 的 `dsh.profile.bundles` 原文顺序、去重、只留字符串 |
+| `patch` | 读 `cordis.patch.yml` 全文（缺失为空串） |
+| `dependencies` | ★ `coordinatesFromProfileDeps`（坐标钉定，见下） |
+| `files` | `opts.files ?? []`（重内容指针，见 `../specs/manifest/v5.md` §8） |
+
+### 1.4.2 ★ 依赖坐标钉定（可复现核心）
+
+`coordinatesFromProfileDeps(host, dir, deps)` 把 `package.json.dependencies` 的「包名 → pnpm spec」转成 manifest 的「**坐标 → 固定版本**」：
+
+- **git 依赖**（`github:owner/repo[#sha][&path:pkg]` 或 `git+https://…`）：sha 优先取 spec 的 `#sha`，缺则从 `pnpm-lock.yaml` 的 `packages:` 区块 `resolution.commit` 补（`gitCommitFromLock`），再缺标 `latest`（跟随默认分支最新，不强制钉 sha）。坐标形如 `github:owner/repo` 或 `github:owner/repo#path:/pkg`。
+- **npm 依赖**：若是 **semver 范围**（`^` / `~` / `>` 等，非精确 `x.y.z`），读 `node_modules/<name>/package.json` 的实测 `version` 钉精确；**已是精确版本则原样保留**。
+- **协议型 spec 原样保留**：带 `:` 的（`file:` / `link:` / `workspace:` / URL / 别名）**不做钉定**——否则导入侧会当 npm registry 包去 404。
+
+> 正向（坐标 → `package.json` 依赖，导入侧）与反向（`package.json` 依赖 → 坐标，导出侧）的转换表见 §3.3；导出侧就是它的**逆**。
+
+### 1.4.3 dshhome 形态（`buildHomeManifest` + 四类单元识别）
+
+`packHome` 先 `summarizeHome(files)` 从扫描结果识别四类单元，再生成 manifest：
+
+| 单元 | 判定规则 | manifest 落点 |
+| --- | --- | --- |
+| profile | `profiles/<name>/package.json` | `profiles[name]` = `buildProfileUnit`（`bundles` + `dependencies` + `patch`，即 v4 契约去掉 `profileName`） |
+| preset | `.agent-presets/<id>/agent.cordis.yml` | `presets[id] = { path: ".agent-presets/<id>" }` |
+| skill | `skills/<name>.md`（平铺）或 `skills/<name>/SKILL.md`（目录 bundle） | `skills[] = { path: "skills/<name>" }`（去重） |
+| 指令 | 根 `AGENTS.md` | `instructions = "AGENTS.md"` |
+
+- **`web` / `headless` 不进包**：识别后过滤掉这两个安装基线 profile 模板（由 `dshVersion` 决定，见 `../specs/manifest/v5.md` §4）。
+- `defaultProfile` = `opts.defaultProfile || 字母序第一个 profile`。
+- `skills` 是**轻索引**（只记 `path`）；重技能才带 `sha256` / `size` / `urls`（`../specs/manifest/v5.md` §6）。
+
+## 1.5 组装归档（内存拼 ZIP，非暂存区）
+
+> 实现是**在内存里拼 ZIP 一次写盘**，全程只读源目录、**不落任何临时清单 / 暂存区**，自然不改动源 profile / `$DSH_HOME`。
+
+1. **条目映射** `dspackEntryPath(rel)`：机器文件（`package.json` / `pnpm-workspace.yaml` / `pnpm-lock.yaml`，`pack.js` 的 `ROOT_MACHINE`）→ 归档根；**其余用户文件 → `overrides/<rel>`**。
+2. **profile 形态的 `home/`**：另扫上一级目录 `opts.home`（缺省 `profile.dir/../..` = `$DSH_HOME`），过滤掉 `profiles/` 前缀后由 `opts.homeInclude`（rel 白名单 Set）勾选，勾选项进 `home/<rel>`（→ `$DSH_HOME` 根）。**默认一个都不带**，要带全局 skill / preset 得显式勾选。
+3. **dshhome 形态**：用户文件按 `$DSH_HOME` 相对路径**平铺**进 `overrides/`（`overrides/profiles/<name>/`、`overrides/.agent-presets/`、`overrides/skills/`、`overrides/AGENTS.md`、`overrides/data/`）。
+4. **`manifest.json` + `dspack.json` 最后写入**归档根，覆盖任何扫描残留；`dspack.json` = `{ "format": "dspack", "version": 3 }`。
+5. **纯 ZIP**（`fflate` 的 `zipSync`，标准 `PK` 头），文件名 `<manifest.name>-<manifest.version>.dspack`。
+6. 输出已存在且未 `--force` → 抛「输出文件已存在」；空扫描 / 无选中文件 → 抛错（不产出空包）。
+
+> 机器文件写根、用户文件写 `overrides/`，与 `../specs/pack-structure/v3.md` §3 布局一致；机器文件用 UTF-8 **无 BOM**（Windows 误写 BOM 会让安装端 `JSON.parse` 崩）。
+
+## 1.6 源仓库形态（`exportRepo` / `dspack pack --repo`）
+
+把 profile 物化为**可二次开发 / 重打包的 git 仓库**，`content` 三档（默认 `readme`）：
+
+| 档 | 内容 |
+| --- | --- |
+| `manifest` | 仅 `manifest.json` |
+| `readme` | `manifest.json` + `README.md`（由 manifest 渲染） |
+| `full` | 全套：机器文件进根、其余进 `overrides/` + `.dspackignore` |
+
+- 仓库目录 = `<out>/<name>`（**不带版本号**）；`release/` 始终产出 `.dspack` + `.sha256` 侧车（`.gitignore` 不入库）。
+- **先产 release 拿 sha256**，再把顶层 `manifest.sha256` 写进仓库根的 `manifest.json`——该字段只存在于**源仓库形态**，`.dspack` 内部的 manifest 不带（避免循环）。
+- **版本冲突**：`release/` 已有同版本产物且未「覆盖 / 跳过」→ 抛 `ReleaseConflictError`（`replaceRelease: true` 覆盖 / `'skip'` 跳过）。
+- git：首次 `init + add + commit`（commit 消息 `export:<name>@<version>`），之后增量提交；无 git / 无变更降级不算失败。
+
+## 1.7 打包前预览（`inspect`）
+
+`inspectProfile` / `inspectHome`（CLI `dspack inspect`）是**干跑检查**：返回扫描结果 + manifest v5 预览 + 特殊目录摘要（skill / agent-preset / icon，`summarizeSpecial`）+ home 级候选（供 GUI 勾选），**不写任何文件**。用于打包前「将包含 / 排除哪些文件、manifest 长什么样」的人工确认。
+
+## 1.8 导出自检清单
+
+- [ ] **三入口分清**：`pack`（单 profile）/ `pack-home`（dshhome）/ `pack --repo`（源仓库）；纯 pack 只返回 `sha256` / `size`，侧车由 repo 形态或发布环节写。
+- [ ] **字段完整**：`manifest.json` 必需字段齐全；`displayName` / `description`（多语言）、`author`、`icon`、`dshVersion`（精确）、`patch` 尽量填。
+- [ ] **坐标钉定**：npm 范围依赖已钉精确、git 依赖 sha 已从 spec / pnpm-lock 补齐；`file:` / `link:` / `workspace:` 协议 spec 原样保留未被压平。
+- [ ] **机器文件**：`package.json`（快照）、`pnpm-workspace.yaml`、`pnpm-lock.yaml` 一并进包根；`package.json` 只是快照，`dependencies` / `bundles` 由 manifest 权威重建。
+- [ ] **机器 / 用户分离**：用户文件只进 `overrides/`（+ 勾选的 `home/`）；`manifest.json` / `dspack.json` 最后写入覆盖残留。
+- [ ] **五类安全过滤生效**：含 home 级路径前缀（`profiles/web/` `profiles/headless/` `attachments/` `skills/.system/`）与精确名（`.dshpkcfg` / `.credentials.yaml` / `settings.yaml`）；重内容走 `files[]` / `skills[]` 不进包体。
+- [ ] **dshhome 专属**：`profiles` 非空且不含 `web` / `headless`，`defaultProfile` 指向存在的 key；四类单元（profile / preset / skill / 指令）识别正确。
 
 ---
 
@@ -204,7 +298,7 @@ v5 的 `dependencies` 是「坐标 → 固定版本」，转换规则（`../spec
 1. **编码 BOM 坑**：机器文件误写 UTF-8 BOM 会让安装端 `JSON.parse` 崩；导出侧用 utf8NoBOM。
 2. **路径分隔符统一 `/`**：归档内 `rel` 一律 `/`，对照逻辑依赖这一点。
 3. **符号链接整体丢弃**：不做解引用。
-4. **暂存区隔离**：打包 / 导入都用系统临时目录，结束清理，不污染用户目录。
+4. **隔离不污染源目录**：打包在内存拼 ZIP（不落临时目录）、全程只读源目录；导入用系统临时目录解包，结束清理。
 5. **v2 判定靠 `plugins` 字段**：早期 `validateManifest` 靠 `plugins` 存在性判 v1/v2、不读 `manifestVersion`（`../specs/manifest/v2.md` §8.1）。现代实现应统一以 `manifestVersion` 为准。
 6. **`home/` 与 `overrides/` 语义一致**：都是文件级复制替换，不做字段级合并；合并式覆盖由 `cordis.patch.yml`（Cordis 补丁层）承担。
 
@@ -213,13 +307,29 @@ v5 的 `dependencies` 是「坐标 → 固定版本」，转换规则（`../spec
 ## 6. 伪代码骨架
 
 ```ts
-/* 导出 */
-async function pack(source: Profile | DshHome): Promise<{ dspack, sha256, size }> {
-  const scan = scanSource(source);                 // 扫描 + 四类安全过滤 + v3 扩展
-  const manifest = buildManifest(source, scan);    // v5：type profile / dshhome
-  const staging = assemble(manifest, scan);        // overrides/ (+ home/) + dspack.json v3 + manifest.json
-  const dspack = zip(staging);                     // 纯 ZIP
-  return { dspack, sha256: sha256hex(dspack), size: dspack.length };
+/* 导出（三入口，实现于 packages/core/src/pack.js / repo.js） */
+async function packProfile(host, profile, opts) {                      // dspack pack
+  const scan = await scanProfile(host, profile.dir);                  // 扫描 + 五类安全过滤
+  const manifest = await buildManifest(host, profile, opts, scan);    // v5 type:"profile"（含坐标钉定）
+  const entries = {};
+  for (const f of selectFiles(scan.files, opts.include)) entries[dspackEntryPath(f.rel)] = await host.readFile(f.abs);
+  for (const f of selectedHome(opts)) entries[`home/${f.rel}`] = await host.readFile(f.abs);  // home/ 上一级内容
+  entries['manifest.json'] = entries['dspack.json'] = /* 最后写入，覆盖残留 */;
+  const dspack = buildDspack(entries);                                // 内存 zipSync，无暂存区
+  return { manifest, output, sha256: sha256hex(dspack), size: dspack.length };
+}
+
+async function packHome(host, home, opts) {                           // dspack pack-home
+  const summary = summarizeHome(files);                               // 四类单元识别（去 web/headless）
+  const manifest = await buildHomeManifest(host, home, { ...opts, ...summary });
+  /* 组装同上，overrides/ 按 $DSH_HOME 相对路径平铺 → 写 <name>-<version>.dspack */
+}
+
+async function exportRepo(host, profile, opts) {                      // dspack pack --repo
+  const pack = await packProfile(host, profile, { ...opts, out: releaseDir });
+  await host.writeTextFile(`${releaseDspack}.sha256`, `${pack.sha256}  ${releaseDspack}\n`);  // 侧车在这里写
+  manifest.sha256 = pack.sha256;                                      // 顶层 sha256，仅源仓库形态
+  /* 写 manifest.json / README / .dspackignore / .gitignore → git init + add + commit */
 }
 
 /* 市场 */
@@ -265,7 +375,7 @@ async function installDshhome(buf, m) {
 
 | 维度 | 判断依据 | 取值 |
 | --- | --- | --- |
-| 三职责 | CLI 命令 | `pack`（导出）/ `list` `view` `market`（市场）/ `install`（导入） |
+| 三职责 | CLI 命令 | `pack` `pack-home` `pack --repo`（导出）/ `list` `view` `market`（市场）/ `install`（导入） |
 | 容器 | 文件头 / 根 `dspack.json` | `.dspack` v3（现行）/ `.dspack` v2 / `.tgz` |
 | manifest | 根 `manifest.json` 的 `manifestVersion` | 5（现行）/ 4 / 3 / 2 / 1（拒绝） |
 | 形态 | v5 的 `type` | `profile` / `dshhome`（`collection` 拒绝） |
