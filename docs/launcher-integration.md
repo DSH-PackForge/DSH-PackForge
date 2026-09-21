@@ -127,6 +127,8 @@
 
 ## 1.6 源仓库形态（`exportRepo` / `dspack pack --repo`）
 
+> 目的：`.dspack` 是编好的成品（不可 diff / 不可直接改），而市场采集器（`dsh-pack-market`）恰恰是**扫 GitHub 上打了 `dsh-pack` 话题的公开仓库**（默认分支根 `manifest.json` + Release 资产）来收录的。源仓库就是「这个被扫的仓库」的本地物化——一次导出，既得可二次开发的源码形态，又能直接推上去被市场自动收录（`../specs/publishing/v1.md` §2 / §6）。
+
 把 profile 物化为**可二次开发 / 重打包的 git 仓库**，`content` 三档（默认 `readme`）：
 
 | 档 | 内容 |
