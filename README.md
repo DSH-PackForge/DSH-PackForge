@@ -45,7 +45,8 @@ DSH-PackForge/
 ├── notes/                         # 实现备忘（非 spec）
 │   └── windows-preview-handler.md # .dspack 预览/缩略图处理器开发备忘
 ├── docs/                          # 实现指南（非 spec）
-│   └── launcher-integration.md    # 启动器集成指南（导出 pack / 市场 market / 导入 install 三职责）
+│   ├── launcher-integration.md    # 启动器集成指南（导出 pack / 市场 market / 导入 install 三职责）
+│   └── publishing-tutorial.md     # 上传到 GitHub 教程（建仓 / 打标签 / 发 Release / 校验，人机可执行）
 ├── examples/                      # 示例包（预留）
 ├── LICENSE                        # MIT
 └── README.md
@@ -68,6 +69,8 @@ DSH-PackForge/
 | `specs/workspace-config/v1.md` | **现行** | `.dshpkcfg` 导出工作区快照（导出参数持久化，不打包） |
 
 > 给启动器作者：见 [`docs/launcher-integration.md`](docs/launcher-integration.md) —— 导出（pack）、市场（market）、导入（install）三段式实现指南（现行 v5 / `.dspack` v3 为主线，历史版本向后兼容）。
+>
+> 给整合包作者：见 [`docs/publishing-tutorial.md`](docs/publishing-tutorial.md) —— 把整合包仓库上传到 GitHub 的分步教程（建仓 + 打 `dsh-pack` 标签 + 发 Release + 校验，可交给 AI 照着执行）。
 
 ## 怎么选版本
 
