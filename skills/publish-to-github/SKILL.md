@@ -1,6 +1,8 @@
 ---
 name: publish-to-github
-description: 把 DSH 整合包发布到 GitHub 供 dsh-pack-market 自动收录。当用户要「发布/上传整合包到 GitHub」「发 Release」「被市场收录」时使用。覆盖：准备产物（dspack pack --repo 或手工）、建 public 仓库、打 dsh-pack 话题、发正式 Release（.dspack + .sha256 侧车）、逐项校验。
+description: 把 DSH 整合包发布到 GitHub 供 dsh-pack-market 自动收录——建 public 仓库、打 dsh-pack 话题、发正式 Release（.dspack + .sha256 侧车）、逐项校验。
+whenToUse: 用户要「发布/上传整合包到 GitHub」「发 Release」「让整合包被市场收录」时。
+invocation: 发布到 GitHub / 发布整合包 / publish to github
 ---
 
 # 发布整合包到 GitHub
