@@ -9,9 +9,12 @@
 | ID | 启动器 / 桌面端 | 版本自报 |
 | --- | --- | --- |
 | `dshl` | PCL-Deepseek-Harness-Launcher（PCL2 魔改） | ✅ 四段式（如 `0.1.1.2`） |
+| `hdsl` | [HDSL · Hello DeepSeek Launcher](https://github.com/MCXCC303/HDSL)（HMCL 内核 JavaFX；`.dspack` 市场采纳者，另维护自有 `.hdslp` 格式） | ✅ |
 | `dsh-packforge-app` | DSH PackForge GUI / `dspack` CLI | ✅ |
 | `official-desktop` | DeepSeek Harness 官方桌面端 | ✅ |
 | `dsh-cli` | 裸 `dsh` 命令行（无启动器） | ✅（`dsh --version`） |
+
+> ⚠️ **防混淆**：`dshl`（PCL 系）与 `hdsl`（Hello 系）一个字母之差、完全无关，引用与文档书写时务必核对。
 
 > 待认领：第三方启动器按 §2 流程 PR 追加。
 
