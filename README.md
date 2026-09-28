@@ -2,7 +2,9 @@
 
 DSH 整合包平台 · **规范仓库**。
 
-像玩 Minecraft 整合包一样，**一键导出、分享、安装** DSH AI 智能体配置包。本仓库定义「整合包（modpack）」的全部格式标准：
+> 📜 **协议入口**:[`PROTOCOL.md`](PROTOCOL.md)——组件地图与门禁速查、r 修订治理规则、角色路由、互操作边界、TL;DR。现行发布标签 **`protocol-2026-09`**。
+
+像玩 Minecraft 整合包一样,**一键导出、分享、安装** DSH AI 智能体配置包。本仓库定义「整合包(modpack)」的全部格式标准:
 
 - `specs/manifest/` —— 包内 `manifest.json` 的契约（版本演进 v1 → v2 → v3 → v4 → v5）；
 - `specs/pack-structure/` —— 包结构：`.tgz`（v1，历史）→ `.dspack`（v2，历史）→ `.dspack` v3（现行）；

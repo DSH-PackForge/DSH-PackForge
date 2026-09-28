@@ -1,6 +1,8 @@
 # 启动器注册表（launcher-registry）
 
 > 状态：**现行**。本表是 manifest v5 r2 `launchers` 字段（`../manifest/v5.md` §14）引用的**启动器 canonical ID 认领表**。安装端判定规则见 `../pack-structure/v3.md` §8.4。
+>
+> **机器可读版本**：`https://dsh-packforge.github.io/dsh-pack-market/launchers.json`（schemaVersion 1，与本表同步发布；第三方如 DSHL 的 README 可直接引用）。消费纪律：拉取失败 / 结构非法时必须回落内置清单，不得阻断安装或编辑流程。
 
 ---
 
