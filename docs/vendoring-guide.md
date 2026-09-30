@@ -1,4 +1,4 @@
-# vendoring 与离线包 · 规范解读（v5 r2）
+# vendoring 与离线包 · 规范解读（v5 r3）
 
 > 面向：**整合包作者**（怎么标、怎么写）与**启动器实现者**（怎么装）。
 > 规范本体：`../specs/manifest/v5.md` §12、`../specs/pack-structure/v3.md` §8、`../specs/publishing/v1.md` §8。

@@ -117,4 +117,4 @@
 2. `web/index.json`、`web/packs/` 是部署副本，勿手动改（事实源是 `index/`）。
 3. 指针三件套的 `sha256` / `size` 由打包流程产出，完整性校验「牵一发动全身」。
 4. v5 `dshhome` 形态的完整字段（`profiles` / `presets` / `skills` / `instructions`）**不在索引平铺**，仅存于懒加载 manifest；索引只带 `type` + 计数。
-5. v5 r2 的 `dshVersions` / `launchers` / `vendored` 完整内容**不在索引平铺**（指针制不膨胀）；索引只带派生标记 `launcherRestricted`，其余走懒加载。「离线可装」（`vendored` 全量覆盖）由懒加载 manifest 派生，**不设独立声明字段**。
+5. v5 r2 / r3 的 `dshVersions` / `launchers` / `vendored` 完整内容**不在索引平铺**（指针制不膨胀）；索引只带派生标记 `launcherRestricted`，其余走懒加载。「离线可装」（全部直接依赖带 `vendor:` 前缀 + 闭包收齐）同样由懒加载 manifest 派生，**不设独立声明字段**。

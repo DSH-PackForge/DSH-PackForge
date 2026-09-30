@@ -61,14 +61,14 @@ DSH-PackForge/
 
 | 规范 | 状态 | 一句话 |
 |---|---|---|
-| `specs/manifest/v5.md` | **现行（v5 r2）** | 统一版本：`type:"profile"` 或 `"dshhome"`；r2 增补：vendored 依赖内嵌（`vendored{}`，局部/全量覆盖，统一安装算法）、`dshVersions` 兼容集、`launchers` 兼容声明 |
+| `specs/manifest/v5.md` | **现行（v5 r3）** | 统一版本：`type:"profile"` 或 `"dshhome"`；r2 增补：`vendored{}` 依赖内嵌、`dshVersions` 兼容集、`launchers` 兼容声明；**r3**：依赖键两类（裸坐标=只从网络 / `vendor:<包名>`=只从包内）、本地化安装算法、闭包条目 `name@version` |
 | `specs/manifest/v4.md` | **历史** | v3 + `type`（profile/collection 预留）+ 可选 `files[]` 下载清单 |
 | `specs/manifest/v3.md` | 历史 | 依赖「坐标 → 固定版本 / commit sha」、`dshVersion` 精确、displayName 多语言，可复现；仍兼容导入 |
 | `specs/manifest/v2.md` | 历史 | `bundles` / `dependencies` / `patch` 三分离层栈契约；启动器兼容导入 |
 | `specs/manifest/v1.md` | 已废弃 | 压平的 `plugins[]`，无法表达加载语义；安装时拒绝 |
 | `specs/pack-structure/v1.md` | 历史 | L1 单 `.tgz`：扁平 Profile 快照 + 根 `manifest.json`，四类安全过滤 |
 | `specs/pack-structure/v2.md` | **历史** | `.dspack`：纯 ZIP + 根 `dspack.json` 标记 + `overrides/` + 可选 `files[]` 按需拉取 |
-| `specs/pack-structure/v3.md` | **现行（v3 r2）** | `.dspack` v3：统一 profile（`overrides/` + 可选 `home/`）与 dshhome 两形态；r2 增补：可选 `vendor/` 依赖内嵌（直挂 / 离线店两策略 + DSHL 方言互操作） |
+| `specs/pack-structure/v3.md` | **现行（v3 r3）** | `.dspack` v3：统一 profile（`overrides/` + 可选 `home/`）与 dshhome 两形态；r2 增补：可选 `vendor/` 目录；**r3**：本地化两支安装算法（npm 来源改 `file:` / git 来源只改 `resolution`）、pnpm 11 冷静期、DSHL 方言互操作 |
 | `specs/index/index.md` | **现行** | index.json 索引契约（schemaVersion 2）：精简指针制 + `packs/<owner>.<repo>/` 懒加载完整 manifest/README |
 | `specs/publishing/v1.md` | **现行** | 仓库创建 + Release 发布 + sha256 侧车 + `dsh-pack` 话题收录 |
 | `specs/workspace-config/v1.md` | **现行** | `.dshpkcfg` 导出工作区快照（导出参数持久化，不打包） |
@@ -78,7 +78,7 @@ DSH-PackForge/
 >
 > 给整合包作者：见 [`docs/publishing-tutorial.md`](docs/publishing-tutorial.md) —— 把整合包仓库上传到 GitHub 的分步教程（建仓 + 打 `dsh-pack` 标签 + 发 Release + 校验，可交给 AI 照着执行）。
 >
-> 给需要内嵌依赖 / 离线分发的作者：见 [`docs/vendoring-guide.md`](docs/vendoring-guide.md) —— 三种 vendoring 组合（兜底混合 / 本地优先 / 完全离线）的选型决策树、manifest 写法与常见误区。
+> 给需要内嵌依赖 / 离线分发的作者：见 [`docs/vendoring-guide.md`](docs/vendoring-guide.md) —— 依赖键两类（裸坐标=只从网络 / `vendor:<包名>`=只从包内）与离线包的选型决策树、manifest 写法与常见误区。
 
 ## 怎么选版本
 
@@ -106,11 +106,11 @@ https://dsh-packforge.github.io/dsh-pack-market/badges/versions/pack-v{1..3}-{zh
 
 | 版本 | 状态 |
 |---|---|
-| `manifest v5` / `pack v3` | **现行（v5 r2 / v3 r2，2026-09 修订）** |
+| `manifest v5` / `pack v3` | **现行（v5 r3 / v3 r3，2026-09 修订）** |
 | `manifest v4 / v3 / v2`、`pack v2 / v1` | 历史（仍兼容导入） |
 | `manifest v1` | 已废弃（安装时拒绝，一般不挂） |
 
-**特性徽章（v5 r2 起）**：版本徽章声明「能读什么」，特性徽章声明「能利用什么」——增量修订不产生新版本号，只产生新特性徽章：
+**特性徽章（v5 r2 起，r3 沿用）**：版本徽章声明「能读什么」，特性徽章声明「能利用什么」——增量修订不产生新版本号，只产生新特性徽章：
 
 ```
 https://dsh-packforge.github.io/dsh-pack-market/badges/features/{offline-capable,launcher-aware}-{zh,en}.svg

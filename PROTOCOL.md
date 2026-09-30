@@ -14,8 +14,8 @@ DSH 整合包的开放协议:manifest 格式、`.dspack` 容器布局、市场�
 
 | 组件 | 规范文件 | 门禁号(现行) | 管什么 |
 |---|---|---|---|
-| Manifest | [`specs/manifest/v5.md`](specs/manifest/v5.md) | `manifestVersion: 5`(r2) | 包元数据、依赖、`dshVersions`、`vendored{}`、`launchers`、导入行为 |
-| 容器 / 打包与安装 | [`specs/pack-structure/v3.md`](specs/pack-structure/v3.md) | dspack `version: 3`(r2) | `.dspack` 布局、安全过滤、`vendor/` 目录、打包端义务(§8.6)与本地化算法(§8.3)、方言互操作(§8.5) |
+| Manifest | [`specs/manifest/v5.md`](specs/manifest/v5.md) | `manifestVersion: 5`(r3) | 包元数据、依赖键两类、`dshVersions`、`vendored{}`、`launchers`、导入行为 |
+| 容器 / 打包与安装 | [`specs/pack-structure/v3.md`](specs/pack-structure/v3.md) | dspack `version: 3`(r3) | `.dspack` 布局、安全过滤、`vendor/` 目录、打包端义务(§8.6)与本地化算法(§8.3)、方言互操作(§8.5) |
 | 市场索引 | [`specs/index/index.md`](specs/index/index.md) | `schemaVersion: 2` | 市场条目格式与采集行为 |
 | 发布礼仪 | [`specs/publishing/v1.md`](specs/publishing/v1.md) | —(编辑性) | 体积/license/存档审计/离线包须知(§8) |
 | 工作区配置 | [`specs/workspace-config/v1.md`](specs/workspace-config/v1.md) | —(隐式 v1) | `.dshpkcfg` 导出参数快照(工具本地,不进包) |
@@ -36,6 +36,7 @@ DSH 整合包的开放协议:manifest 格式、`.dspack` 容器布局、市场�
 | 批次 | 日期 | 内容 |
 |---|---|---|
 | v5 r2 / v3 r2 | 2026-09 | vendoring 机制、`dshVersions`、`launchers`、四阶段导入、§8.6 打包端义务、方言互操作、launcher-registry(需求来源 [issue #3](https://github.com/DSH-PackForge/DSH-PackForge/issues/3)) |
+| **v5 r3 / v3 r3** | 2026-09 | **算法替换(实测驱动)**:依赖键两类(裸坐标=只从网络 / `vendor:<包名>`=只从包内、不记来源)、按锁文件节点形态的**本地化两支**、闭包条目键 `name@version` + `kind`/`name`、版本后缀撤销为可选、pnpm 11 `minimumReleaseAge: 0` |
 | HDSL 调研吸收 | 2026-09 | 探测三态(UNKNOWN → 保守内嵌)、`hdsl` ID 注册 |
 | workspace-config 增补 | 2026-09 | `.dshpkcfg` 新增 `dshVersions` / `vendor` / `launchers` 旋钮 |
 
@@ -50,7 +51,7 @@ DSH 整合包的开放协议:manifest 格式、`.dspack` 容器布局、市场�
 
 ## 4. 互操作边界(生态事实)
 
-- **正式语法**:`vendor:<包名>` 键前缀(只从包内) + `vendored{}` 哈希清单 + `vendor/` tarball 目录(manifest v5 r2 / pack-structure v3 r2)。
+- **正式语法**:`vendor:<包名>` 键前缀(只从包内) + `vendored{}` 哈希清单 + `vendor/` tarball 目录(manifest v5 r2 / r3、pack-structure v3 r2 / r3)。
 - **消费宽容、生产禁止**:PCL-DSHL 的 `vendor:<file>.tgz` 值方言 + `vendor/vendor.json`——安装器**应当**能消费(按隐式 vendored 条目处理),生成器**禁止**产出。(两处 `vendor:` 含义不同:DSHL 放在**值**上、丢失版本;本协议放在**键**上、保留版本。)
 - **独立格式**:HDSL 的 `.hdslp` 自有格式(与 `.dspack` 平行,非方言);其导出侧三态探测已反哺本协议(§8.6)。
 - ⚠️ `dshl`(PCL 系)与 `hdsl`(Hello 系)一个字母之差,完全无关。
