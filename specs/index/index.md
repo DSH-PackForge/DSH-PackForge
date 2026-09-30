@@ -44,6 +44,8 @@
 | `author` | string | 否 | 作者 |
 | `category` | string | 否 | 分类（市场筛选用；缺省 `uncategorized`） |
 | `dshVersion` | string | 否 | 运行所需 DSH 精确版本号（v3 起） |
+| `dshVersions` | string[] | 否 | 实测兼容的版本枚举集（可选平铺；也可只留懒加载 manifest） |
+| `launcherRestricted` | boolean | 否 | 包内存在 `launchers` 声明的**派生标记**，供列表廉价过滤；完整声明仅存于懒加载 manifest |
 | `profileName` | string | 否 | 安装时创建的 profile 名（profile 形态） |
 | `downloadUrl` | string | ✅ | `http(s)` 下载地址（指针 1） |
 | `sha256` | string | ✅ | 覆盖整个包的 64 位十六进制哈希（指针 2） |
