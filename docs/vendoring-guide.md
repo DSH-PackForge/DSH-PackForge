@@ -1,6 +1,6 @@
 # vendoring 与离线包 · 规范解读（v5 r2）
 
-> 面向：**整合包作者**（怎么选覆盖范围、怎么写）与**启动器实现者**（怎么装）。
+> 面向：**整合包作者**（怎么标、怎么写）与**启动器实现者**（怎么装）。
 > 规范本体：`../specs/manifest/v5.md` §12、`../specs/pack-structure/v3.md` §8、`../specs/publishing/v1.md` §8。
 > 本文是解读——与规范冲突时，以规范为准。
 
@@ -8,104 +8,121 @@
 
 ## 1. 一句话心智模型
 
-**只有一个旋钮：`vendored` 的覆盖范围。**
+**依赖的来源由键唯一确定，没有「看情况」。**
 
 ```
-dependencies ──── 坐标 → 精确版本(永远是权威,永不改变)
-vendored ──────── 其中哪些坐标随包带了 tarball 副本(vendor/ 目录)
-                  ├─ 覆盖一部分 → 混合分发(覆盖内本地,其余云端)
-                  └─ 覆盖全部(含传递闭包) → 离线可装
+裸坐标        "zustand": "4.5.0"                   → 只从网络
+vendor: 前缀  "vendor:dsh-pet": "0.3.0"            → 只从包内（vendored{} 必有条目）
+闭包条目      vendored{} 里的 "name@version"        → 在 vendored{} 里 = 包内；否则网络
 ```
 
-没有模式字段（`vendorMode` / `offline` 曾在草案中出现，定稿前删除——见 §5 误区）。**本地还是云端、严格离线还是允许网络，全部由安装器统一算法决定**（§4），manifest 只声明「带了什么」。
+一个包可以两类并存。**离线包**只是「全部直接依赖都带前缀」的特例，不是必须声明的模式。
 
-## 2. 两种形态（按覆盖范围）
+## 2. 三类条目
 
-### 形态一：局部覆盖（混合分发）
+### 2.1 裸坐标（只从网络）
 
 ```jsonc
-{
-  "dependencies": {
-    "dsh-pet": "0.2.0",                                   // 副本在包里 → 本地命中
-    "github:DViridescent/dafy-whale-theme": "99e8c57",     // 无副本 → 云端
-    "my-private-plugin": "1.0.0"                           // 从未发布 → 副本是唯一来源
-  },
-  "vendored": {
-    "dsh-pet":            { "version": "0.2.0", "sha256": "…", "size": 123, "path": "vendor/npm__dsh-pet/dsh-pet-0.2.0.tgz", "reason": "explicit" },
-    "my-private-plugin":  { "version": "1.0.0", "sha256": "…", "size": 123, "path": "vendor/npm__my-private-plugin/my-private-plugin-1.0.0.tgz", "reason": "unpublished" }
-  }
+"dependencies": {
+  "zustand": "4.5.0",                                  // npm
+  "github:DViridescent/dafy-whale-theme": "99e8c57"     // git（值是 commit sha）
 }
 ```
 
-- **安装器行为**（统一算法）：副本命中的坐标直接用本地，其余走 registry——「一些本地、一些云端」不需要任何模式字段，**覆盖范围本身就是控制手段**。
-- **适用**：有依赖可能 unpublish / 从未发布——防丢保险；或想让某些依赖固定用作者实测的字节。
-- **注意**：老启动器只认 `dependencies`，遇到死上游依赖会**干净失败**（报错 + 回滚，不会半装）。含死依赖的包请按 `../specs/publishing/v1.md` §8 声明 `launchers` 白名单 + README 标注。
-- **魔改插件**（本地修改版，`reason: "local-modified"`）：打包端会把它重打包为**上游不存在的后缀版本**（如 `0.2.0-local.1`，规范强制，见 v3 §8.6）——老启动器解析该版本失败 → **响亮失败**，不会静默装到上游原版；新启动器 `vendor/` 命中魔改版。若沿用上游原版本号，老启动器会「成功」装上**原版**——**静默偏差**（无人发现货不对板），规范已明文禁止。此类包同样务必声明 `launchers` 白名单。
-
-### 形态二：全量覆盖（离线可装）
+### 2.2 `vendor:<包名>`（只从包内，不记来源）
 
 ```jsonc
-{
-  "dependencies": { …全部依赖… },
-  "vendored": { …全部直接依赖 + 全部传递依赖（以 pnpm-lock.yaml 为准）… }
+"dependencies": {
+  "vendor:dsh-pet": "0.3.0",
+  "vendor:my-private-plugin": "1.0.0"
+},
+"vendored": {
+  "vendor:dsh-pet": { "version": "0.3.0", "sha256": "…", "size": 123,
+                      "path": "vendor/npm__dsh-pet/dsh-pet-0.3.0.tgz", "reason": "upstream-missing" },
+  "vendor:my-private-plugin": { "version": "1.0.0", "sha256": "…", "size": 123,
+                      "path": "vendor/npm__my-private-plugin/my-private-plugin-1.0.0.tgz", "reason": "unpublished" }
 }
 ```
 
-- **安装器行为**：统一算法下所有坐标命中本地，一次装完；启动器检测到覆盖完整时可自选严格 `--offline`（零网络、缺件即报错）。
-- **适用**：内网 / 隔离机器；「上游已全灭」的存档包（依赖死光后依然可安装）。
-- **注意**（三条硬要求，详见 `../specs/publishing/v1.md` §8）：
-  1. 覆盖必须**含传递闭包**——不是只盖直接依赖；「离线可装」是覆盖完整性**派生**的属性，漏一件就在离线机器上装不了；
-  2. 体积：> 500 MB 建议标注，GitHub Release 单资产上限 2 GiB；
-  3. license：内嵌即再分发，逐一确认。
+- 键上**只有包名**：不写 owner/repo、不写 commit sha（内嵌后来源不参与安装）；
+- 值 = **包版本**，与 `vendored[].version`、tarball 内 `package.json` 的 `version` **三处一致**；
+- **老启动器**遇到这个键名 → pnpm 判非法包名 → **响亮失败**（它兑现不了「只从包内」；要服务老启动器就另发不含前缀的版本）；
+- `reason`：`upstream-missing`（上游已消失）/ `unpublished`（从未发布）/ `local-modified`（本地魔改）/ `explicit`（为离线的显式内嵌）。
+
+### 2.3 闭包条目（传递依赖）
+
+```jsonc
+"vendored": {
+  "esbuild@0.25.12": { "kind": "closure", "name": "esbuild", "version": "0.25.12",
+                       "sha256": "…", "size": 456, "path": "vendor/npm__esbuild/esbuild-0.25.12.tgz" }
+}
+```
+
+- 键 = `name@version`（同名多版本会并存，必须带版本），`kind` / `name` 必填；
+- 必须能在随包 `pnpm-lock.yaml` 的 `packages:` / `snapshots:` 里找到——这是**防夹带**校验（闭包条目不是直接依赖，最容易被塞私货）；
+- 要「整包离线」就必须收齐闭包（`full` 档沿 lockfile 收）。
 
 ## 3. 怎么选（决策树）
 
 ```
-你的依赖全部健在,且不需要控制来源?
-├─ 是 → 什么都不写(纯在线,现状)
+依赖全部健在、也不要求固定字节?
+├─ 是 → 什么都不写（纯在线，现状）
 └─ 否 ↓
-   只想给部分依赖上保险 / 固定来源?
-   ├─ 是 → 局部 vendoring(形态一)
-   └─ 目标环境无网 / 做死上游存档?
-       └─ 是 → 全量覆盖(形态二,含传递闭包)
+   只有个别依赖会消失 / 要固定魔改版?
+   ├─ 是 → 给那几个坐标加 vendor: 前缀（其余裸键）
+   └─ 目标机器无网 / 要做死上游存档?
+       └─ 是 → 全部直接依赖加前缀 + 收齐闭包（离线包）
 ```
 
-## 4. 安装器视角（统一算法——一条路径，无模式开关）
+## 4. 安装器视角（本地化，两支）
 
 ```
-vendor/ 存在?
-  → 逐 tarball sha256 校验(阶段 0 预检)
-  → 预填充本地 pnpm store(一次)
-  → pnpm install --prefer-offline
+阶段 0 预检：vendored 键 = dependencies 键（含前缀）逐字对账；裸键出现在 vendored{} → 拒装；
+             逐 tarball sha256 + size 校验；读 tarball 内 package.json 核对 name / version
+阶段 1 落盘：解 vendor/ 到 profile 的 vendor-blobs/；写 package.json 与 pnpm-lock.yaml（下表两支）
+阶段 2 安装：pnpm install --frozen-lockfile --trust-lockfile
+             （全部直接依赖带前缀时可加 --offline；包内 pnpm-workspace.yaml 写 minimumReleaseAge: 0）
 ```
 
-- 本地命中即用副本，未命中走 registry——本地与网络自动互为兜底；**死上游依赖第一遍就命中本地**，不存在「失败 → 重试」分支；
-- 覆盖完整（对照 lockfile）时，启动器可自选 `--offline` 严格模式；
-- **为什么不需要模式字段**：tarball 与上游**字节一致**（规范硬约束），本地优先与云端优先装出的结果完全相同，差别只有来源与带宽——本地副本已随包下载，命中本地永远不劣于再拉 registry。既然结果相同，声明「prefer / fallback / offline」就是冗余；「离线可装」由覆盖完整性**算出来**，不需要作者**说出来**（说出来还有说谎风险，算出来没有）。
+| 支 | 触发 | 改什么 |
+| --- | --- | --- |
+| **A · npm 来源** | lockfile 节点是 registry 版本（`pkg@1.2.3`） | `package.json` 写 `file:./vendor-blobs/<file>.tgz`；lockfile **四处同步**：importer 的 `specifier` + `version`、`packages` 键、`resolution`、`snapshots` 键 |
+| **B · git 来源** | 节点含 `gitHosted` / codeload URL | 只改 `resolution.tarball` → 本地文件；`gitHosted` 与 `integrity` 不动；`package.json` 的 spec 从 lockfile importer 复制 |
+| 闭包条目 | 在 `vendored{}` 里 | 同支 B（只改 `resolution.tarball`） |
 
-**直挂（轻量替代）**：无传递依赖的叶子包可 `tar` 直解 `node_modules/`（须同时从写入的 package.json 剔除该坐标），绕过 store；带依赖的包必须走统一算法。
+- **不用 `--prefer-offline`**：它表达「本地优先、否则联网」，与「来源由键确定」矛盾；
+- 只改一处会报 `ERR_PNPM_OUTDATED_LOCKFILE`（importer 与 `package.json` 的 specifier 必须一致）；
+- **不要试图「预填充 pnpm store」**：`file:` 预热出的条目不带 integrity，registry 风格解析仍报 `ERR_PNPM_NO_OFFLINE_TARBALL`；
+- 安装后 `vendor-blobs/` 属已安装状态，**不可清理**（profile 的 `package.json` / `pnpm-lock.yaml` 引用它）。
 
-完整导入流程（阶段划分、预检、回滚）见 `../specs/manifest/v5.md` §11。
+完整导入流程（阶段划分、回滚）见 `../specs/manifest/v5.md` §11。
 
 ## 5. 常见误区
 
 | 误区 | 事实 |
 | --- | --- |
-| 「局部 / 全量 / 离线要写不同的安装逻辑」 | **一条统一算法全覆盖**（预填充 store + `--prefer-offline`），无模式分支（v3 §8.3） |
-| 「需要 `vendorMode: "prefer"` 表达本地优先」 | 不需要——覆盖范围本身就决定了哪些走本地；该字段已在定稿前删除 |
-| 「需要 `offline: true` 声明离线包」 | 不需要——「离线可装」由覆盖完整性**派生**，声明字段反而引入说谎风险（漏闭包也能写 true）；该字段已在定稿前删除 |
-| 「实现就是先直挂本地、再 pnpm 装云端」 | 朴素直挂有坑：pnpm 按 package.json 驱动，死上游坐标还在里面就会去拉 registry；直挂仅限叶子包且须剔除坐标，带依赖的包走统一算法 |
-| 「`vendored` 可以写 `dependencies` 没有的坐标」 | 校验拒绝。`dependencies` 是唯一权威清单——宁可老启动器响亮失败，不许静默半装 |
-| 「魔改插件沿用上游版本号就行」 | 禁止——老启动器会「成功」装到上游**原版**（静默偏差）；必须用上游不存在的 prerelease 后缀版本（v3 §8.6） |
-| 「版本后缀可以让启动器安装时补」 | 禁止——安装端不得改写包内任何字节（破坏 sha256 闭环）；后缀是打包期固化的静态数据 |
-| 「重内容也该走 `vendored`」 | 不。插件依赖走 `vendored`；非依赖的重内容走 `files[]` 指针制（下载 + sha256），两个通道不混用 |
-| 「`dependencies` 直接用 `file:` 相对路径代替 `vendored{}`」 | 不可。`file:` 只能指向**直接依赖**，闭包条目（`@cordis/core` 这类传递依赖）无资格进 `dependencies`，离线需求落空；且丢 `sha256` 装前预验与 `reason` 元数据，并违反 `../specs/manifest/v5.md` §2 前向兼容规则 |
+| 「裸键的依赖也会用包内副本」 | 不会。裸键 = **只从网络**；要包内就得加 `vendor:` 前缀 |
+| 「`vendor:` 键要写来源（`vendor:github:owner/repo`）」 | 不需要也不允许——内嵌后来源不参与安装与定位（定位按 tarball 内 `name@version` 认 lockfile 节点） |
+| 「预填充 store 就能离线」 | 不行（`ERR_PNPM_NO_OFFLINE_TARBALL`）；必须改 lockfile 的取件地址 |
+| 「`package.json` 写 `file:` 就够了」 | 不够——lockfile 的 importer / packages / snapshots 必须同步，否则 `ERR_PNPM_OUTDATED_LOCKFILE` |
+| 「魔改必须改版本号」 | 不必（早期的版本后缀约定已撤销为**可选**）；`vendor:` 前缀已保证老启动器响亮失败 |
+| 「老启动器也能装离线包」 | 不能。全部带前缀 = 全部非法包名 → 整包装不上；须声明 `launchers` 白名单并在详情页写明 |
+| 「`vendored` 可以写任意 `dependencies` 没有的坐标」 | 只有**闭包条目**可以（键 `name@version`，且须 ∈ 随包 lockfile）；**裸键**出现在 `vendored{}` 一律拒装 |
+| 「重内容也该走 `vendored`」 | 不。插件依赖走 `vendored`；非依赖重内容走 `files[]`，两通道不混用 |
+| 「`dependencies` 值直接用 `file:` 代替 `vendored{}`」 | 不可——闭包条目无资格进 `dependencies`（离线需求落空），且丢 `sha256` 装前预验与 `reason` 元数据 |
 
 ## 6. 与 `files[]` 的分工
 
 | | `vendored` + `vendor/` | `files[]` |
 | --- | --- | --- |
 | 装什么 | **插件依赖**（`dependencies` 里的坐标） | **任意重内容**（模型、数据、大资源） |
-| 落点 | `node_modules`（经统一算法或直挂） | manifest 声明的 `path` |
+| 落点 | `node_modules`（经本地化两支） | manifest 声明的 `path` |
 | 云端形态 | registry / git | `urls[]` 指针下载 |
-| 本地形态 | 包内 `vendor/*.tgz` | （无——要本地化就把文件进包，但通常走指针） |
+| 本地形态 | 包内 `vendor/*.tgz` | （无——通常走指针） |
+
+## 7. 发布注意（`../specs/publishing/v1.md` §8）
+
+- 体积：> 500 MB 建议标注；GitHub Release 单资产上限 2 GiB；
+- license：内嵌即再分发，逐一确认；
+- 含 `vendor:` 键的包**必须**声明 `launchers` 白名单，并在 README / 详情页注明「N 个依赖为包内副本」；
+- 离线包发版前以离线模式 dry-run 试装一次（确认闭包无遗漏）。
