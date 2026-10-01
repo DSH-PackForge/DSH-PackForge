@@ -6,12 +6,28 @@
 </p>
 
 <p align="center">
-  <a href="specs/manifest/v5.md"><img src="https://dsh-packforge.github.io/dsh-pack-market/badges/versions/manifest-v5-zh.svg" alt="manifest v5"></a>
-  <a href="specs/pack-structure/v3.md"><img src="https://dsh-packforge.github.io/dsh-pack-market/badges/versions/pack-v3-zh.svg" alt="dspack v3"></a>
-  <a href="specs/index/index.md"><img src="assets/badges/index-schema-2.svg" alt="index schemaVersion 2"></a>
-  <img src="assets/badges/license-mit.svg" alt="许可证 MIT">
-  <a href="https://github.com/DSH-PackForge/DSH-PackForge/pulls"><img src="assets/badges/prs-welcome.svg" alt="欢迎 PR"></a>
-  <a href="https://github.com/topics/dsh-pack"><img src="assets/badges/topic-dsh-pack.svg" alt="话题 dsh-pack"></a>
+  <!-- 规范版本（shields 静态徽章，统一取品牌色 labelColor=墨 / color=朱砂） -->
+  <a href="specs/manifest/v5.md"><img src="https://img.shields.io/badge/manifest-v5-c0392b?style=flat-square&labelColor=2b2620" alt="manifest v5"></a>
+  <a href="specs/pack-structure/v3.md"><img src="https://img.shields.io/badge/dspack-v3-c0392b?style=flat-square&labelColor=2b2620" alt="dspack v3"></a>
+  <a href="specs/index/index.md"><img src="https://img.shields.io/badge/index-schemaVersion_2-c0392b?style=flat-square&labelColor=2b2620" alt="index schemaVersion 2"></a>
+  <a href="specs/launcher-registry.md"><img src="https://img.shields.io/badge/launchers-registry-c0392b?style=flat-square&labelColor=2b2620" alt="launcher registry"></a>
+</p>
+
+<p align="center">
+  <!-- 生态活数据（shields dynamic/json 直读市场发布的 JSON，自动更新） -->
+  <a href="https://dsh-packforge.github.io/dsh-pack-market/"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdsh-packforge.github.io%2Fdsh-pack-market%2Findex.json&query=%24.modpacks.length&label=%E6%95%B4%E5%90%88%E5%8C%85&color=c0392b&labelColor=2b2620&style=flat-square" alt="整合包数量"></a>
+  <a href="specs/launcher-registry.md"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdsh-packforge.github.io%2Fdsh-pack-market%2Flaunchers.json&query=%24.launchers.length&label=%E5%90%AF%E5%8A%A8%E5%99%A8&color=c0392b&labelColor=2b2620&style=flat-square" alt="启动器数量"></a>
+  <a href="https://github.com/topics/dsh-pack"><img src="https://img.shields.io/badge/topic-dsh--pack-c0392b?style=flat-square&labelColor=2b2620" alt="话题 dsh-pack"></a>
+</p>
+
+<p align="center">
+  <!-- GitHub 原生状态（shields github/*，自动更新） -->
+  <a href="https://github.com/DSH-PackForge/DSH-PackForge/stargazers"><img src="https://img.shields.io/github/stars/DSH-PackForge/DSH-PackForge?style=flat-square&labelColor=2b2620&color=c0392b&logo=github" alt="stars"></a>
+  <a href="https://github.com/DSH-PackForge/DSH-PackForge/forks"><img src="https://img.shields.io/github/forks/DSH-PackForge/DSH-PackForge?style=flat-square&labelColor=2b2620&color=c0392b&logo=github" alt="forks"></a>
+  <a href="https://github.com/DSH-PackForge/DSH-PackForge/issues"><img src="https://img.shields.io/github/issues/DSH-PackForge/DSH-PackForge?style=flat-square&labelColor=2b2620&color=c0392b&logo=github" alt="issues"></a>
+  <a href="https://github.com/DSH-PackForge/DSH-PackForge/commits/main"><img src="https://img.shields.io/github/last-commit/DSH-PackForge/DSH-PackForge?style=flat-square&labelColor=2b2620&color=c0392b&logo=git" alt="last commit"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/DSH-PackForge/DSH-PackForge?style=flat-square&labelColor=2b2620&color=c0392b" alt="license"></a>
+  <a href="https://github.com/DSH-PackForge/DSH-PackForge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-c0392b?style=flat-square&labelColor=2b2620&logo=github" alt="PRs welcome"></a>
 </p>
 
 # DSH-PackForge
@@ -60,8 +76,7 @@ DSH-PackForge/
 │   │   └── v1.md                  # ★ 现行（.dshpkcfg 导出工作区快照）
 │   └── launcher-registry.md       # ★ 现行（启动器 canonical ID 认领表）
 ├── assets/                        # 品牌资产
-│   ├── banner.svg / banner-dark.svg   # README 头图（纸墨朱砂，明 / 暗）
-│   └── badges/                    # 自建静态徽章（与市场徽章同款）
+│   └── banner.svg / banner-dark.svg   # README 头图（纸墨朱砂，明 / 暗）
 ├── notes/                         # 实现备忘（非 spec）
 │   └── windows-preview-handler.md # .dspack 预览/缩略图处理器开发备忘
 ├── docs/                          # 实现指南（非 spec）
