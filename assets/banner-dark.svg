@@ -74,35 +74,33 @@
     <text x="322" y="301">index schemaVersion 2</text>
   </g>
 
-  <!-- 流程：打包 → 市场 → 安装 -->
-  <g>
-    <rect x="668" y="112" width="132" height="76" rx="14" fill="#2a2620" stroke="#3b352c"/>
-    <text x="734" y="147" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
-          font-size="20" font-weight="700" fill="#ece7de" text-anchor="middle">打包</text>
-    <text x="734" y="169" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
-          font-size="11" fill="#8f8678" text-anchor="middle">dspack pack</text>
+  <!-- 三步（纵向） -->
+  <line x1="700" y1="64" x2="700" y2="252" stroke="#3b352c" stroke-width="1"/>
 
-    <rect x="848" y="112" width="132" height="76" rx="14" fill="#3a2826" stroke="#5a3a34"/>
-    <text x="914" y="147" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
-          font-size="20" font-weight="700" fill="#e0604f" text-anchor="middle">市场</text>
-    <text x="914" y="169" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
-          font-size="11" fill="#e0604f" text-anchor="middle">index.json</text>
-
-    <rect x="1028" y="112" width="132" height="76" rx="14" fill="#2a2620" stroke="#3b352c"/>
-    <text x="1094" y="147" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
-          font-size="20" font-weight="700" fill="#ece7de" text-anchor="middle">安装</text>
-    <text x="1094" y="169" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
-          font-size="11" fill="#8f8678" text-anchor="middle">dspack install</text>
-
-    <g stroke="#e0604f" stroke-width="2" fill="none">
-      <path d="M 806 150 L 830 150"/>
-      <path d="M 986 150 L 1010 150"/>
-    </g>
-    <path d="M 838 150 l -7 -4 l 0 8 z" fill="#e0604f"/>
-    <path d="M 1018 150 l -7 -4 l 0 8 z" fill="#e0604f"/>
+  <g font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif" font-size="20" font-weight="700">
+    <text x="722" y="85" fill="#ece7de">打包</text>
+    <text x="722" y="165" fill="#e0604f">市场</text>
+    <text x="722" y="245" fill="#ece7de">安装</text>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', 'Menlo', monospace" font-size="11" fill="#8f8678" text-anchor="end">
+    <text x="1004" y="84">dspack pack</text>
+    <text x="1004" y="164">index.json</text>
+    <text x="1004" y="244">dspack install</text>
   </g>
 
+  <!-- 目录引导点线 -->
+  <g stroke="#4c4436" stroke-width="1" stroke-dasharray="1 6" fill="none">
+    <path d="M 786 78 L 896 78"/>
+    <path d="M 786 158 L 896 158"/>
+    <path d="M 786 238 L 896 238"/>
+  </g>
+
+  <!-- 节点：市场为实心 -->
+  <circle cx="700" cy="78" r="4.5" fill="#211d18" stroke="#e0604f" stroke-width="2"/>
+  <circle cx="700" cy="158" r="5.5" fill="#e0604f"/>
+  <circle cx="700" cy="238" r="4.5" fill="#211d18" stroke="#e0604f" stroke-width="2"/>
+
   <!-- 说明 -->
-  <text x="914" y="220" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
-        font-size="13" fill="#8f8678" text-anchor="middle">打包端产出 · 市场分发 · 启动器导入</text>
+  <text x="700" y="288" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="13" fill="#8f8678">打包端产出 · 市场分发 · 启动器导入</text>
 </svg>
