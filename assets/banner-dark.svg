@@ -74,6 +74,17 @@
     <text x="322" y="301">index schemaVersion 2</text>
   </g>
 
+  <!-- 竖排书耳：整合 —— 包罗万象 -->
+  <g font-family="'Songti SC', 'Noto Serif SC', 'SimSun', serif" font-size="18" fill="#b5ac9e" text-anchor="middle">
+    <text x="669" y="132">整</text>
+    <text x="669" y="156">合</text>
+    <text x="669" y="216">包</text>
+    <text x="669" y="240">罗</text>
+    <text x="669" y="264">万</text>
+    <text x="669" y="288">象</text>
+  </g>
+  <rect x="668" y="172" width="2" height="26" rx="1" fill="#e0604f"/>
+
   <!-- 三步（纵向） -->
   <line x1="700" y1="64" x2="700" y2="252" stroke="#3b352c" stroke-width="1"/>
 
