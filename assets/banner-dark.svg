@@ -5,11 +5,43 @@
       <stop offset="0%" stop-color="#3a2826" stop-opacity="1"/>
       <stop offset="100%" stop-color="#3a2826" stop-opacity="0"/>
     </radialGradient>
+
+    <!-- 网点 -->
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#4c4436"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0.30" stop-color="#000000"/>
+      <stop offset="0.78" stop-color="#ffffff"/>
+    </linearGradient>
+    <mask id="dotsMask"><rect width="1280" height="320" fill="url(#fade)"/></mask>
   </defs>
 
   <!-- 纸（暗） -->
   <rect width="1280" height="320" fill="#211d18"/>
   <rect width="1280" height="320" fill="url(#glow)"/>
+  <rect width="1280" height="320" fill="url(#dots)" opacity="0.5" mask="url(#dotsMask)"/>
+
+  <!-- 裁切角标 -->
+  <g stroke="#4c4436" stroke-width="2" fill="none" stroke-linecap="square">
+    <path d="M 24 40 L 24 24 L 40 24"/>
+    <path d="M 1240 24 L 1256 24 L 1256 40"/>
+    <path d="M 1256 280 L 1256 296 L 1240 296"/>
+    <path d="M 40 296 L 24 296 L 24 280"/>
+  </g>
+
+  <!-- 层叠线稿 -->
+  <g fill="none" stroke="#4c4436" stroke-width="2">
+    <rect x="1078" y="42" width="96" height="24" rx="7"/>
+    <rect x="1090" y="52" width="96" height="24" rx="7"/>
+    <rect x="1102" y="62" width="96" height="24" rx="7" stroke="#e0604f"/>
+  </g>
+
+  <!-- 大字水印 -->
+  <text x="1236" y="304" font-family="'Songti SC', 'Noto Serif SC', 'SimSun', serif"
+        font-size="190" font-weight="700" fill="#ece7de" opacity="0.04" text-anchor="end">匣</text>
+
+  <!-- 外框 -->
   <rect x="8.5" y="8.5" width="1263" height="303" rx="18" fill="none" stroke="#3b352c" stroke-width="1"/>
 
   <!-- 品牌标记 -->
@@ -70,6 +102,7 @@
     <path d="M 1086 148 l -7 -4 l 0 8 z" fill="#e0604f"/>
   </g>
 
+  <!-- 说明 -->
   <text x="1004" y="232" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
         font-size="13" fill="#8f8678" text-anchor="middle">打包端产出 · 市场分发 · 启动器导入</text>
 </svg>
