@@ -34,12 +34,19 @@
   <text x="1236" y="304" font-family="'Songti SC', 'Noto Serif SC', 'SimSun', serif"
         font-size="190" font-weight="700" fill="#2b2620" opacity="0.05" text-anchor="end">层</text>
 
-  <!-- 层叠线稿（层栈语汇，右上） -->
+  <!-- 虚线导引：串住下行斜阶 -->
+  <path d="M 690 90 L 1120 239" stroke="#cfc5b0" stroke-width="1.5" stroke-dasharray="2 5" fill="none"/>
+
+  <!-- 层叠线稿（层栈语汇，右上留白处） -->
   <g fill="none" stroke="#cfc5b0" stroke-width="2">
     <rect x="1064" y="44" width="96" height="24" rx="7"/>
     <rect x="1076" y="54" width="96" height="24" rx="7"/>
     <rect x="1088" y="64" width="96" height="24" rx="7" stroke="#c0392b"/>
   </g>
+
+  <!-- 题款 slug（右上） -->
+  <text x="1216" y="142" font-family="'Songti SC', 'Noto Serif SC', 'SimSun', serif"
+        font-size="18" fill="#5f574a" text-anchor="end">整合<tspan fill="#c0392b">——</tspan>包罗万象</text>
 
   <!-- 外框 -->
   <rect x="8.5" y="8.5" width="1263" height="303" rx="18" fill="none" stroke="#e0d8c8" stroke-width="1"/>
@@ -74,44 +81,41 @@
     <text x="322" y="301">index schemaVersion 2</text>
   </g>
 
-  <!-- 竖排书耳：整合 —— 包罗万象 -->
-  <g font-family="'Songti SC', 'Noto Serif SC', 'SimSun', serif" font-size="18" fill="#5f574a" text-anchor="middle">
-    <text x="669" y="132">整</text>
-    <text x="669" y="156">合</text>
-    <text x="669" y="216">包</text>
-    <text x="669" y="240">罗</text>
-    <text x="669" y="264">万</text>
-    <text x="669" y="288">象</text>
-  </g>
-  <rect x="668" y="172" width="2" height="26" rx="1" fill="#c0392b"/>
-
-  <!-- 三步（纵向）：一条竖线 + 节点 + 左标签 / 右 mono 列 -->
-  <line x1="700" y1="64" x2="700" y2="252" stroke="#e0d8c8" stroke-width="1"/>
-
-  <g font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif" font-size="20" font-weight="700">
-    <text x="722" y="85" fill="#2b2620">打包</text>
-    <text x="722" y="165" fill="#a12f22">市场</text>
-    <text x="722" y="245" fill="#2b2620">安装</text>
-  </g>
-  <g font-family="ui-monospace, 'SF Mono', 'Menlo', monospace" font-size="11" fill="#8b8172" text-anchor="end">
-    <text x="1004" y="84">dspack pack</text>
-    <text x="1004" y="164">index.json</text>
-    <text x="1004" y="244">dspack install</text>
+  <!-- 三步：下行斜阶（左上 → 右下） -->
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="10" fill="#8b8172">
+    <text x="660" y="56">01</text>
+    <text x="838" y="118">02</text>
+    <text x="1016" y="180">03</text>
   </g>
 
-  <!-- 目录引导点线（标签 ↔ mono 值） -->
-  <g stroke="#cfc5b0" stroke-width="1" stroke-dasharray="1 6" fill="none">
-    <path d="M 786 78 L 896 78"/>
-    <path d="M 786 158 L 896 158"/>
-    <path d="M 786 238 L 896 238"/>
+  <g>
+    <rect x="660" y="64" width="132" height="76" rx="14" fill="#fffdf8" stroke="#e0d8c8"/>
+    <text x="726" y="98" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+          font-size="20" font-weight="700" fill="#2b2620" text-anchor="middle">打包</text>
+    <text x="726" y="120" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
+          font-size="11" fill="#8b8172" text-anchor="middle">dspack pack</text>
+
+    <rect x="838" y="126" width="132" height="76" rx="14" fill="#f7e5e2" stroke="#e5c4be"/>
+    <text x="904" y="160" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+          font-size="20" font-weight="700" fill="#a12f22" text-anchor="middle">市场</text>
+    <text x="904" y="182" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
+          font-size="11" fill="#a12f22" text-anchor="middle">index.json</text>
+
+    <rect x="1016" y="188" width="132" height="76" rx="14" fill="#fffdf8" stroke="#e0d8c8"/>
+    <text x="1082" y="222" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+          font-size="20" font-weight="700" fill="#2b2620" text-anchor="middle">安装</text>
+    <text x="1082" y="244" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
+          font-size="11" fill="#8b8172" text-anchor="middle">dspack install</text>
+
+    <g stroke="#c0392b" stroke-width="2" fill="none">
+      <path d="M 796 110 L 828 146"/>
+      <path d="M 974 172 L 1006 208"/>
+    </g>
+    <path d="M 834 154 L 829 142 L 822 149 Z" fill="#c0392b"/>
+    <path d="M 1012 216 L 1007 204 L 1000 211 Z" fill="#c0392b"/>
   </g>
 
-  <!-- 节点：市场为实心（分发中枢） -->
-  <circle cx="700" cy="78" r="4.5" fill="#f6f2ea" stroke="#c0392b" stroke-width="2"/>
-  <circle cx="700" cy="158" r="5.5" fill="#c0392b"/>
-  <circle cx="700" cy="238" r="4.5" fill="#f6f2ea" stroke="#c0392b" stroke-width="2"/>
-
-  <!-- 说明 -->
-  <text x="700" y="288" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+  <!-- 说明（左下留白处） -->
+  <text x="660" y="292" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
         font-size="13" fill="#8b8172">打包端产出 · 市场分发 · 启动器导入</text>
 </svg>
