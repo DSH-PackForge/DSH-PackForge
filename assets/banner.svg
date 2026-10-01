@@ -30,9 +30,9 @@
     <path d="M 40 296 L 24 296 L 24 280"/>
   </g>
 
-  <!-- 大字水印：置于中缝，兼作左右两半的连接 -->
-  <text x="655" y="300" font-family="'Songti SC', 'Noto Serif SC', 'SimSun', serif"
-        font-size="190" font-weight="700" fill="#2b2620" opacity="0.05" text-anchor="middle">层</text>
+  <!-- 大字水印：层 -->
+  <text x="1236" y="304" font-family="'Songti SC', 'Noto Serif SC', 'SimSun', serif"
+        font-size="190" font-weight="700" fill="#2b2620" opacity="0.05" text-anchor="end">层</text>
 
   <!-- 层叠线稿（层栈语汇，右上） -->
   <g fill="none" stroke="#cfc5b0" stroke-width="2">
