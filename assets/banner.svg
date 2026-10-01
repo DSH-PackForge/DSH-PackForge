@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="DSH-PackForge — 整合包规范仓库">
+  <title>DSH-PackForge · 整合包规范仓库</title>
+  <defs>
+    <radialGradient id="glow" cx="82%" cy="-10%" r="70%">
+      <stop offset="0%" stop-color="#f7e5e2" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#f7e5e2" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 纸 -->
+  <rect width="1280" height="320" fill="#f6f2ea"/>
+  <rect width="1280" height="320" fill="url(#glow)"/>
+  <rect x="8.5" y="8.5" width="1263" height="303" rx="18" fill="none" stroke="#e0d8c8" stroke-width="1"/>
+
+  <!-- 品牌标记（与市场页 .brand-mark 同款） -->
+  <rect x="64" y="56" width="84" height="56" rx="14" fill="#c0392b"/>
+  <text x="106" y="92" font-family="Archivo, Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="24" font-weight="800" letter-spacing="1" fill="#ffffff" text-anchor="middle">DSH</text>
+  <text x="164" y="92" font-family="Archivo, Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="20" font-weight="700" fill="#5f574a">PackForge</text>
+
+  <!-- 标题 -->
+  <text x="64" y="176" font-family="Archivo, Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="62" font-weight="800" letter-spacing="-1.5" fill="#2b2620">DSH-PackForge</text>
+  <rect x="66" y="192" width="64" height="5" rx="2.5" fill="#c0392b"/>
+
+  <!-- 副标题 -->
+  <text x="64" y="232" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="21" font-weight="600" fill="#5f574a">整合包规范 · 规范仓库</text>
+
+  <!-- 一句话 -->
+  <text x="64" y="266" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="16" fill="#8b8172">像玩 Minecraft 整合包一样，<tspan fill="#c0392b" font-weight="600">一键导出、分享、安装</tspan> DSH AI 智能体配置包。</text>
+
+  <!-- 版本药丸（与市场页 .stat 同款） -->
+  <g font-family="ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace" font-size="13" fill="#5f574a">
+    <rect x="64" y="284" width="118" height="26" rx="13" fill="#fffdf8" stroke="#e0d8c8"/>
+    <text x="80" y="301">manifest v5</text>
+    <rect x="192" y="284" width="104" height="26" rx="13" fill="#fffdf8" stroke="#e0d8c8"/>
+    <text x="208" y="301">dspack v3</text>
+    <rect x="306" y="284" width="196" height="26" rx="13" fill="#fffdf8" stroke="#e0d8c8"/>
+    <text x="322" y="301">index schemaVersion 2</text>
+  </g>
+
+  <!-- 流程：打包 → 市场 → 安装 -->
+  <g>
+    <!-- 打包 -->
+    <rect x="800" y="112" width="112" height="72" rx="14" fill="#fffdf8" stroke="#e0d8c8"/>
+    <text x="856" y="146" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+          font-size="19" font-weight="700" fill="#2b2620" text-anchor="middle">打包</text>
+    <text x="856" y="167" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
+          font-size="11" fill="#8b8172" text-anchor="middle">dspack pack</text>
+
+    <!-- 市场 -->
+    <rect x="948" y="112" width="112" height="72" rx="14" fill="#f7e5e2" stroke="#e5c4be"/>
+    <text x="1004" y="146" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+          font-size="19" font-weight="700" fill="#a12f22" text-anchor="middle">市场</text>
+    <text x="1004" y="167" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
+          font-size="11" fill="#a12f22" text-anchor="middle">index.json</text>
+
+    <!-- 安装 -->
+    <rect x="1096" y="112" width="112" height="72" rx="14" fill="#fffdf8" stroke="#e0d8c8"/>
+    <text x="1152" y="146" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+          font-size="19" font-weight="700" fill="#2b2620" text-anchor="middle">安装</text>
+    <text x="1152" y="167" font-family="ui-monospace, 'SF Mono', Menlo, monospace"
+          font-size="11" fill="#8b8172" text-anchor="middle">dspack install</text>
+
+    <!-- 箭头 -->
+    <g stroke="#c0392b" stroke-width="2" fill="none">
+      <path d="M 916 148 L 938 148"/>
+      <path d="M 1064 148 L 1086 148"/>
+    </g>
+    <path d="M 938 148 l -7 -4 l 0 8 z" fill="#c0392b"/>
+    <path d="M 1086 148 l -7 -4 l 0 8 z" fill="#c0392b"/>
+  </g>
+
+  <!-- 说明脚注 -->
+  <text x="1004" y="232" font-family="Inter, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="13" fill="#8b8172" text-anchor="middle">打包端产出 · 市场分发 · 启动器导入</text>
+</svg>

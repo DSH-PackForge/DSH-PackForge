@@ -1,3 +1,19 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+    <img src="assets/banner.svg" alt="DSH-PackForge — 整合包规范仓库" width="100%">
+  </picture>
+</p>
+
+<p align="center">
+  <a href="specs/manifest/v5.md"><img src="https://dsh-packforge.github.io/dsh-pack-market/badges/versions/manifest-v5-zh.svg" alt="manifest v5"></a>
+  <a href="specs/pack-structure/v3.md"><img src="https://dsh-packforge.github.io/dsh-pack-market/badges/versions/pack-v3-zh.svg" alt="dspack v3"></a>
+  <a href="specs/index/index.md"><img src="assets/badges/index-schema-2.svg" alt="index schemaVersion 2"></a>
+  <img src="assets/badges/license-mit.svg" alt="许可证 MIT">
+  <a href="https://github.com/DSH-PackForge/DSH-PackForge/pulls"><img src="assets/badges/prs-welcome.svg" alt="欢迎 PR"></a>
+  <a href="https://github.com/topics/dsh-pack"><img src="assets/badges/topic-dsh-pack.svg" alt="话题 dsh-pack"></a>
+</p>
+
 # DSH-PackForge
 
 DSH 整合包平台 · **规范仓库**。
@@ -40,8 +56,12 @@ DSH-PackForge/
 │   │   └── index.md               # ★ 现行（index.json 索引契约，schemaVersion 2）
 │   ├── publishing/
 │   │   └── v1.md                  # ★ 现行（仓库创建 + Release 发布 + 收录契约）
-│   └── workspace-config/
-│       └── v1.md                  # ★ 现行（.dshpkcfg 导出工作区快照）
+│   ├── workspace-config/
+│   │   └── v1.md                  # ★ 现行（.dshpkcfg 导出工作区快照）
+│   └── launcher-registry.md       # ★ 现行（启动器 canonical ID 认领表）
+├── assets/                        # 品牌资产
+│   ├── banner.svg / banner-dark.svg   # README 头图（纸墨朱砂，明 / 暗）
+│   └── badges/                    # 自建静态徽章（与市场徽章同款）
 ├── notes/                         # 实现备忘（非 spec）
 │   └── windows-preview-handler.md # .dspack 预览/缩略图处理器开发备忘
 ├── docs/                          # 实现指南（非 spec）
