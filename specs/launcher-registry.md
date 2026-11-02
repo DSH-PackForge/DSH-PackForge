@@ -12,6 +12,7 @@
 | --- | --- | --- |
 | `dshl` | PCL-Deepseek-Harness-Launcher（PCL2 魔改） | ✅ 四段式（如 `0.1.1.2`） |
 | `hdsl` | [HDSL · Hello DeepSeek Launcher](https://github.com/MCXCC303/HDSL)（HMCL 内核 JavaFX） | ✅ |
+| `pad` | [PAD · pack-agent for DSH](https://github.com/sakikoTGW/pack-agent)（Windows 启动器 + 整合包管理器） | ✅ `pad cli version --json` |
 | `dsh-packforge-app` | DSH PackForge GUI / `dspack` CLI | ✅ |
 | `official-desktop` | DeepSeek Harness 官方桌面端 | ✅ |
 | `dsh-cli` | 裸 `dsh` 命令行（无启动器） | ✅（`dsh --version`） |
