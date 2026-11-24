@@ -36,9 +36,9 @@ DSH 整合包平台 · **规范仓库**。
 
 像玩 Minecraft 整合包一样，**一键导出、分享、安装** DSH AI 智能体配置包。本仓库定义「整合包（modpack）」的全部格式标准：
 
-- `specs/manifest/` 规定清单版本 v1 至 v6。
-- `specs/pack-structure/` 规定历史归档与现行 v4 容器。
-- `specs/dsh_pack/` 规定插件声明和可选资源的可移植格式。
+- `specs/manifest/` —— 包内 `manifest.json` 契约（版本演进 v1 → v6）；
+- `specs/pack-structure/` —— 包结构规范：历史归档与现行 `.dspack` v4 容器；
+- `specs/dsh_pack/` —— 插件数据声明与可选资源清单的可移植格式；
 - `specs/index/` —— `index.json` 索引契约（schemaVersion 2：精简指针制 + packs/ 懒加载）；
 - `specs/publishing/` —— 发布契约：仓库创建 + Release 发布 + `dsh-pack` 收录。
 - `specs/workspace-config/` —— `.dshpkcfg` 导出工作区快照（导出参数持久化，不打包）。
@@ -95,7 +95,7 @@ DSH-PackForge/
 
 | 规范 | 状态 | 一句话 |
 |---|---|---|
-| [manifest v6](specs/manifest/v6.md) | **现行** | 插件多语言展示、图标及按精确依赖指定的 registry |
+| [manifest v6](specs/manifest/v6.md) | **现行** | 插件多语言展示、图标及精确 npm 包源（registry）声明 |
 | `specs/manifest/v5.md` | 历史 | 统一版本：`type:"profile"`（单 profile）或 `type:"dshhome"`（多 profile + preset / skill / 指令）；可选 `dshVersions` 兼容集 + `launchers` 启动器声明 |
 | `specs/manifest/v4.md` | **历史** | v3 + `type`（profile/collection 预留）+ 可选 `files[]` 下载清单 |
 | `specs/manifest/v3.md` | 历史 | 依赖「坐标 → 固定版本 / commit sha」、`dshVersion` 精确、displayName 多语言，可复现；仍兼容导入 |
@@ -104,21 +104,21 @@ DSH-PackForge/
 | `specs/pack-structure/v1.md` | 历史 | L1 单 `.tgz`：扁平 Profile 快照 + 根 `manifest.json`，四类安全过滤 |
 | `specs/pack-structure/v2.md` | **历史** | `.dspack`：纯 ZIP + 根 `dspack.json` 标记 + `overrides/` + 可选 `files[]` 按需拉取 |
 | `specs/pack-structure/v3.md` | 历史 | `.dspack` v3：统一 profile（`overrides/` + 可选 `home/`）与 dshhome（`overrides/` 按 `$DSH_HOME` 平铺）两形态 |
-| [容器 v4](specs/pack-structure/v4.md) | **现行** | v6 清单、四种可选资源及更新规则 |
-| [dsh_pack v1](specs/dsh_pack/v1.md) | **现行** | 插件声明与 path/provider/mcp/skill 归档文件 |
+| [容器 v4](specs/pack-structure/v4.md) | **现行** | 配套 manifest v6、四类可选资源及三方更新合并规则 |
+| [dsh_pack v1](specs/dsh_pack/v1.md) | **现行** | 插件数据声明与 `path`/`provider`/`mcp`/`skill` 资源清单 |
 | `specs/index/index.md` | **现行** | index.json 索引契约（schemaVersion 2）：精简指针制 + `packs/<owner>.<repo>/` 懒加载完整 manifest/README |
 | `specs/publishing/v1.md` | **现行** | 仓库创建 + Release 发布 + sha256 侧车 + `dsh-pack` 话题收录 |
 | `specs/workspace-config/v1.md` | **现行** | `.dshpkcfg` 导出工作区快照（导出参数持久化，不打包） |
 | `specs/launcher-registry.md` | **现行** | 启动器 canonical ID 认领表 + 版本比较规则（manifest `launchers` 引用） |
 
-> 启动器作者可查阅[集成指南](docs/launcher-integration.md)，并使用[可校验示例](examples/v6/)验证单 profile 与整机包。
+> 给启动器作者：见 [`docs/launcher-integration.md`](docs/launcher-integration.md) —— 导出（pack）、市场（market）、导入（install）三段式实现指南，并可结合[可校验示例](examples/v6/)验证单配置档（profile）与全局目录（dshhome）两种形态。
 >
 > 给整合包作者：见 [`docs/publishing-tutorial.md`](docs/publishing-tutorial.md) —— 把整合包仓库上传到 GitHub 的分步教程（建仓 + 打 `dsh-pack` 标签 + 发 Release + 校验，可交给 AI 照着执行）。
 
 ## 怎么选版本
 
-- 写新包使用 manifest v6 和容器 v4。
-- 旧包按其自身标记读取，v5/v3 的已发布内容继续使用历史规范。
+- **写新包 → v6**：使用清单（manifest）v6 与容器（pack-structure）v4。
+- **装旧包 → 向后兼容**：按归档自身标记读取；v5 / v3 的已发布内容继续遵循对应历史规范。
 - **改打包/安装结构 → `pack-structure`**，与 `dsh-packforge-app` 的格式演进对齐（L1 `.tgz` → L2 `.dspack` → L3 重内容 `files[]` 按需拉取）。
 
 ## 启动器徽章
