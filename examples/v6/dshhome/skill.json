@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "key": "skill:home:example",
+      "kind": "skill",
+      "id": "example",
+      "scope": "home",
+      "name": "示例技能",
+      "desc": "内嵌技能目录示例",
+      "mode": "embedded",
+      "flat": false,
+      "digest": "23023a5e8347c51408881dbcb8a8d9f2207b943c4b4750542b6c8094627a689b",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "entry": "extension-data/skill/8ef0b048ad51a9d2ccaf9177716d7c83159a1d8c22fd37aa2b7d03c11b21b40d",
+          "sha256": "8ef0b048ad51a9d2ccaf9177716d7c83159a1d8c22fd37aa2b7d03c11b21b40d"
+        }
+      ]
+    }
+  ]
+}

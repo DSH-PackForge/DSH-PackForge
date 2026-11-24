@@ -4,7 +4,20 @@
 >
 > 权威契约：`../specs/manifest/`、`../specs/pack-structure/`、`../specs/index/`、`../specs/publishing/`。本文只做串联 + 实现要点，**冲突时以 spec 为准**。
 >
-> 主线：现行标准（manifest v5 + `.dspack` v3）。历史版本兼容统一放到「导入」部分的末尾一节次要处理。
+> 新生成的包使用 manifest v6、容器 v4；市场继续使用 schemaVersion 2。实现 v6 的启动器应先按下列步骤集成，再按历史版本选择旧流程。
+
+## 现行格式的读写顺序
+
+1. 导出每个 profile 的层栈、坐标与插件资料。逐项收集声明路径、Provider、MCP、技能，把已识别的配置从基础补丁中移除。只序列化作者选择的附件，凭据保存引用名。
+2. 生成 `dspack.json` 第 4 版与 `manifest.json` 第 6 版。市场详情只消费可公开的展示字段，实际安装读取经过 SHA-256 与大小校验的归档。
+3. 导入前预览来源、资源作用域、冲突和凭据引用。逐 profile 校验专用 registry 的精确包与版本，保留其他包既有解析规则。
+4. 首次安装记录基线。更新时比较上游、基线、本地三份内容，显式处理冲突，在失败时恢复原状态。
+
+完整字段及可校验样本见[manifest v6](../specs/manifest/v6.md)、[容器 v4](../specs/pack-structure/v4.md)、[插件扩展](../specs/dsh_pack/v1.md)与[示例](../examples/v6/)。
+
+## 历史版本的实现与迁移参考
+
+以下章节保留 manifest v5、容器 v3 与更早格式的设计和调用示例。v6 的新增语义以上述现行规范为准。
 
 ## 职责总览
 
@@ -199,7 +212,7 @@
 | 缺失 / 非对象 | 不是 dspack（外来 ZIP / 损坏）→ 拒载 |
 | `format` ≠ `"dspack"` | 拒载 |
 | `version` ≠ 3 | 报「不支持该版本」（历史 `.dspack` v2 见 §3.5） |
-| `version` = 3 | **现行**：`.dspack` v3，承载 manifest v5 → §3.2 |
+| `version` = 3 | **历史 v3**：`.dspack` v3，承载 manifest v5 → §3.2 |
 
 ## 3.2 主线：manifest v5 + `.dspack` v3
 
@@ -378,7 +391,7 @@ async function installDshhome(buf, m) {
 | 维度 | 判断依据 | 取值 |
 | --- | --- | --- |
 | 三职责 | CLI 命令 | `pack` `pack-home` `pack --repo`（导出）/ `list` `view` `market`（市场）/ `install`（导入） |
-| 容器 | 文件头 / 根 `dspack.json` | `.dspack` v3（现行）/ `.dspack` v2 / `.tgz` |
+| 容器 | 文件头 / 根 `dspack.json` | `.dspack` v3（历史）/ `.dspack` v2 / `.tgz` |
 | manifest | 根 `manifest.json` 的 `manifestVersion` | 5（现行）/ 4 / 3 / 2 / 1（拒绝） |
 | 形态 | v5 的 `type` | `profile` / `dshhome`（`collection` 拒绝） |
 | 覆盖落点 | 容器 + 形态 | profile 根 / `$DSH_HOME` 根 |

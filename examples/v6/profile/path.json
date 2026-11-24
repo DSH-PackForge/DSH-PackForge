@@ -1,0 +1,35 @@
+{
+  "plugins": {
+    "@example/foo": [
+      {
+        "key": "path:profile:example:@example/foo:0",
+        "id": "0",
+        "plugin": "@example/foo",
+        "kind": "path",
+        "scope": "profile:example",
+        "name": "界面布局",
+        "desc": "保存当前 profile 的面板布局",
+        "paths": [
+          "<profile>/config/example/layout.json",
+          "<profile>/config/example/panels"
+        ],
+        "directories": [
+          {
+            "path": "profiles/example/config/example/panels",
+            "index": 1,
+            "tail": ""
+          }
+        ],
+        "files": [
+          {
+            "path": "profiles/example/config/example/layout.json",
+            "index": 0,
+            "tail": "",
+            "entry": "extension-data/path/5c859210111374178bd720abdb271e5d752c1598917781b7f91e71139f52640f",
+            "sha256": "5c859210111374178bd720abdb271e5d752c1598917781b7f91e71139f52640f"
+          }
+        ]
+      }
+    ]
+  }
+}

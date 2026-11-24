@@ -1,0 +1,47 @@
+{
+  "manifestVersion": 6,
+  "type": "profile",
+  "name": "example-profile",
+  "version": "1.0.0",
+  "profileName": "example",
+  "bundles": [
+    "@example/foo"
+  ],
+  "dependencies": {
+    "@example/foo": "1.2.3"
+  },
+  "plugins": {
+    "@example/foo": {
+      "name": {
+        "zh-CN": "示例插件",
+        "en": "Example"
+      },
+      "desc": "保存工作区布局",
+      "icon": "assets/plugins/example.svg",
+      "source": {
+        "type": "npm",
+        "registry": "https://registry.example/npm/"
+      }
+    }
+  },
+  "patch": "[]\n",
+  "resources": {
+    "path.json": [
+      {
+        "id": "0",
+        "name": "界面布局",
+        "desc": "保存当前 profile 的面板布局",
+        "scope": "profile:example",
+        "plugin": "@example/foo"
+      }
+    ],
+    "provider.json": [
+      {
+        "id": "example",
+        "name": "示例模型服务",
+        "desc": "使用本机的 API 凭据",
+        "scope": "profile:example"
+      }
+    ]
+  }
+}

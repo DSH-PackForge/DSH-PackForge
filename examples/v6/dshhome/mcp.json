@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "key": "mcp:profile:work:docs",
+      "kind": "mcp",
+      "id": "docs",
+      "scope": "profile:work",
+      "name": "资料服务",
+      "desc": "通过 HTTPS 读取资料",
+      "value": {
+        "id": "docs",
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "config": {
+          "transport": "streamable-http",
+          "serverName": "docs",
+          "url": "https://mcp.example/docs",
+          "headers": {
+            "Authorization": {
+              "$credential": "DOCS_TOKEN",
+              "prefix": "Bearer "
+            }
+          }
+        }
+      },
+      "credentialRefs": [
+        "DOCS_TOKEN"
+      ]
+    }
+  ]
+}

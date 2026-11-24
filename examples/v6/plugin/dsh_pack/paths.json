@@ -1,0 +1,13 @@
+[
+  {
+    "name": {
+      "zh-CN": "界面布局",
+      "en": "Layout"
+    },
+    "desc": "保存当前 profile 的面板布局",
+    "paths": [
+      "<profile>/config/example/layout.json",
+      "<profile>/config/example/panels"
+    ]
+  }
+]
