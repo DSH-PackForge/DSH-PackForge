@@ -47,7 +47,7 @@ dspack pack --repo <profile目录> --out <输出目录>
 
 ```
 <输出目录>/<name>/                     # 源仓库（已 git init + commit）
-├── manifest.json                      # v5（根，含顶层 sha256 字段）
+├── manifest.json                      # v6（根，含顶层 sha256 字段）
 ├── overrides/                         # 用户文件
 ├── README.md                          # 由 manifest 渲染
 └── release/                           # ★ 成品区（不进 git，.gitignore 已排除）
@@ -63,7 +63,7 @@ dspack pack --repo <profile目录> --out <输出目录>
 
 ```bash
 mkdir <name> && cd <name>
-# 放置：manifest.json（根，v5）、overrides/、README.md、可选的 package.json / pnpm-lock.yaml / .github/
+# 放置：manifest.json（根，v6）、overrides/、README.md、可选的 package.json / pnpm-lock.yaml / .github/
 git init
 git add .
 git commit -m "export:<name>@<version>"

@@ -37,7 +37,7 @@ dspack pack --repo <profile目录> --out <输出目录>
 
 产出 `<输出目录>/<name>/`：源仓库（已 git init + commit）+ `release/` 成品区（`.dspack` 与 `.dspack.sha256` 侧车已写好）。校验点：`release/` 里两个文件都在；`git log` 有提交 `export:<name>@<version>`。
 
-**路径 B**：在 `<name>/` 下摆好 `manifest.json`（根，v5）、`overrides/`、`README.md`，然后：
+**路径 B**：在 `<name>/` 下摆好 `manifest.json`（根，v6）、`overrides/`、`README.md`，然后：
 
 ```bash
 git init && git add . && git commit -m "export:<name>@<version>"

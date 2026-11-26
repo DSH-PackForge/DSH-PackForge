@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "kind": "provider",
+      "key": "provider:profile:example:example",
+      "id": "example",
+      "scope": "profile:example",
+      "name": "示例模型服务",
+      "desc": "使用本机的 API 凭据",
+      "owner": "llm-pi-ai",
+      "value": {
+        "baseURL": "https://api.example/v1",
+        "apiKeyEnv": "EXAMPLE_API_KEY"
+      },
+      "credentialRefs": [
+        "EXAMPLE_API_KEY"
+      ]
+    }
+  ]
+}

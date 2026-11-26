@@ -1,0 +1,39 @@
+{
+  "manifestVersion": 6,
+  "type": "dshhome",
+  "name": "example-home",
+  "version": "1.0.0",
+  "defaultProfile": "example",
+  "profiles": {
+    "example": {
+      "bundles": [],
+      "dependencies": {},
+      "patch": "[]\n"
+    },
+    "work": {
+      "bundles": [],
+      "dependencies": {},
+      "patch": "[]\n"
+    }
+  },
+  "presets": {},
+  "skills": [],
+  "resources": {
+    "mcp.json": [
+      {
+        "id": "docs",
+        "name": "资料服务",
+        "desc": "通过 HTTPS 读取资料",
+        "scope": "profile:work"
+      }
+    ],
+    "skill.json": [
+      {
+        "id": "example",
+        "name": "示例技能",
+        "desc": "内嵌技能目录示例",
+        "scope": "home"
+      }
+    ]
+  }
+}

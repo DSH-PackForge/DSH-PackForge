@@ -6,7 +6,7 @@
 >
 > 代码定位：采集器 `dsh-pack-market/scripts/collect.mjs`（生成）；消费者 `dsh-pack-market/web/market.js`（网页）与 `dsh-packforge-app/packages/core/src/market.js`（`readMarketIndex` / `fetchMarketPackDetail`）。
 >
-> 关联：`../manifest/v3.md` / `../manifest/v4.md` / `../manifest/v5.md`（条目内 manifest 字段的契约，v3/v4/v5 兼容）、`../publishing/v1.md`（收录流程）。
+> 关联：`../manifest/v3.md` / `../manifest/v4.md` / `../manifest/v5.md` / `../manifest/v6.md`（条目内 manifest 字段的契约，v3/v4/v5/v6 兼容）、`../publishing/v1.md`（收录流程）。
 
 ---
 
@@ -15,7 +15,7 @@
 `index.json` 是整合包平台的**中心索引**，采用「精简指针制」两段式：
 
 - **索引（`index.json`）**：只平铺列表卡片 / 搜索 / 安装命令必需的字段——`downloadUrl + sha256 + size` 三个指针 + 展示元数据（`name` / `displayName` / `description` / `author` / `category` / `dshVersion` / `profileName` / `updatedAt`）+ 定位字段（`id` / `owner` / `repo`）+ 计数（`bundleCount` / `depCount` / `profileCount`）。**不含** `bundles[]` / `dependencies{}` / `files[]` / `profiles` / `presets` / `skills` 等可能较大的字段。
-- **懒加载目录（`packs/<owner>.<repo>/`）**：每包一个目录，存**完整原始 manifest.json**（v3/v4/v5，原样）与源仓库 **README.md**。消费者需要完整字段时按 `id` 懒加载。
+- **懒加载目录（`packs/<owner>.<repo>/`）**：每包一个目录，存**完整原始 manifest.json**（v3/v4/v5/v6，原样）与源仓库 **README.md**。消费者需要完整字段时按 `id` 懒加载。
 
 > 为什么拆开：v5 `dshhome` 形态的 manifest 可携带多 profile + presets + skills + instructions，体量可能较大；放进索引会让首页 index.json 膨胀。指针字段 + 计数足以支撑列表/搜索，重字段按需拉取。
 
@@ -35,7 +35,7 @@
 
 | 字段 | 类型 | 必需 | 说明 |
 | --- | --- | --- | --- |
-| `manifestVersion` | number | 否 | 声明本条所遵循的 manifest 契约版本（3/4/5），采集器缺省按 5 |
+| `manifestVersion` | number | 否 | 声明本条所遵循的 manifest 契约版本（3/4/5/6），历史记录缺省按 4 |
 | `type` | string | 否 | `"profile"` \| `"dshhome"`；缺省按 `"profile"`（v5 dshhome 显式声明） |
 | `name` | string | ✅ | slug（`^[a-z0-9-]+$`）；与 `version` 组成唯一键 |
 | `version` | string | ✅ | semver |
@@ -105,7 +105,7 @@
 
 | 层 | 载体 | 说明 |
 | --- | --- | --- |
-| 整合包 `.dspack` | 归档内 `manifest.json` | manifest 契约（`../manifest/`，v3/v4/v5） |
+| 整合包 `.dspack` | 归档内 `manifest.json` | manifest 契约（`../manifest/`，v3/v4/v5/v6） |
 | 包结构 | 归档内文件布局 | 打包流程产出 `sha256` / `size`（`../pack-structure/`） |
 | 索引 `index.json` | 中心仓库 | 精简指针：`downloadUrl` / `sha256` / `size` + 展示元数据 + `id` |
 | 懒加载 `packs/<id>/` | 中心仓库 | 完整 manifest + README，详情页/客户端按需拉取 |
@@ -118,3 +118,7 @@
 2. `web/index.json`、`web/packs/` 是部署副本，勿手动改（事实源是 `index/`）。
 3. 指针三件套的 `sha256` / `size` 由打包流程产出，完整性校验「牵一发动全身」。
 4. v5 `dshhome` 形态的完整字段（`profiles` / `presets` / `skills` / `instructions`）**不在索引平铺**，仅存于懒加载 manifest；索引只带 `type` + 计数。
+
+## v6 详情与资源摘要
+
+中心索引继续沿用 `schemaVersion: 2`。插件标签、图标与归档资源摘要均从 `packs/<id>/manifest.json` 按需读取。`resources` 为可选的纯展示摘要，市场不得将配置 `value`、认证请求头、命令参数或本机文件内容写入摘要；安装端一律以通过完整性校验的实际归档为准。[v6 可选资源字段](../manifest/v6.md#4-可选资源安装与兼容性)
